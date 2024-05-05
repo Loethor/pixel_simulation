@@ -13,16 +13,20 @@ func set_brush(value:int) -> void:
 
 var n_steps := 0
 
-enum MATERIALS {AIR, BEDROCK, SAND, WATER}
+enum MATERIALS {SAND, WATER, BEDROCK, OIL, FIRE }
 const MATERIAL_TO_ATLAS_COORD:Dictionary = {
-	MATERIALS.BEDROCK:Vector2i(0,2),
 	MATERIALS.SAND:Vector2i(0,0),
 	MATERIALS.WATER:Vector2i(0,1),
+	MATERIALS.BEDROCK:Vector2i(0,2),
+	MATERIALS.OIL:Vector2i(0,3),
+	MATERIALS.FIRE:Vector2i(0,4),
 }
 const ATLAS_COORD_TO_MATERIAL:Dictionary = {
-	Vector2i(0,2):MATERIALS.BEDROCK,
 	Vector2i(0,0):MATERIALS.SAND,
 	Vector2i(0,1):MATERIALS.WATER,
+	Vector2i(0,2):MATERIALS.BEDROCK,
+	Vector2i(0,3):MATERIALS.OIL,
+	Vector2i(0,4):MATERIALS.FIRE,
 }
 const MAIN_LAYER := 0
 
@@ -41,6 +45,10 @@ func _input(event: InputEvent) -> void:
 		material_in_hand = MATERIALS.WATER
 	if event.is_action_pressed("bedrock"):
 		material_in_hand = MATERIALS.BEDROCK
+	if event.is_action_pressed("oil"):
+		material_in_hand = MATERIALS.OIL
+	if event.is_action_pressed("fire"):
+		material_in_hand = MATERIALS.FIRE
 
 func _process(delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
@@ -69,6 +77,10 @@ func loop_tile_set() -> void:
 	var next_generation_water_cells = process_cells(water_cells, MATERIALS.WATER)
 	set_cells_next_generation(next_generation_water_cells, MATERIALS.WATER)
 
+	var oil_cells = get_cells_by_material(MATERIALS.OIL)
+	var next_generation_oil_cells = process_cells(oil_cells, MATERIALS.OIL)
+	set_cells_next_generation(next_generation_oil_cells, MATERIALS.OIL)
+
 	sand_label.text = "Sand: %s" % len(sand_cells)
 	water_label.text = "Water: %s" % len(water_cells)
 	#print(n_steps)
@@ -92,7 +104,11 @@ func process_cells(array_of_cells:Array[Vector2i], cell_material:MATERIALS) -> A
 		MATERIALS.SAND:
 			next_generation_cells = get_next_generation_sand(array_of_cells)
 		MATERIALS.WATER:
-			next_generation_cells = get_next_generation_water(array_of_cells)
+			next_generation_cells = get_next_generation_liquid(array_of_cells)
+		MATERIALS.OIL:
+			next_generation_cells = get_next_generation_liquid(array_of_cells)
+		_:
+			pass
 
 	return next_generation_cells
 func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
@@ -103,9 +119,9 @@ func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]
 		var down_left_cell := Vector2i(cell.x - 1, cell.y + 1)
 		var down_right_cell := Vector2i(cell.x + 1, cell.y + 1)
 
-		# down empty
+		# down cell is empty
 		if is_cell_empty_at(down_cell):
-			#this double check is stupid
+			#this double check is stupid but needed
 			# TODO improve this
 			if is_position_available(down_cell, next_generation_cells):
 				tile_map.set_cell(MAIN_LAYER, cell, -1)
@@ -119,6 +135,11 @@ func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]
 				MATERIALS.WATER:
 					next_generation_cells.append(down_cell)
 					tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.WATER])
+				# swap them
+				# TODO maybe custom data bool is_liquid?
+				MATERIALS.OIL:
+					next_generation_cells.append(down_cell)
+					tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.OIL])
 				_:
 					# both down right and down left empty
 					if is_position_available(down_left_cell, next_generation_cells) and \
@@ -137,7 +158,7 @@ func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]
 						next_generation_cells.append(down_right_cell)
 	return next_generation_cells
 
-func get_next_generation_water(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
+func get_next_generation_liquid(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
 	var next_generation_cells: Array[Vector2i] = []
 
 	for cell in array_of_cells:
@@ -146,27 +167,39 @@ func get_next_generation_water(array_of_cells:Array[Vector2i]) -> Array[Vector2i
 		var right_cell := Vector2i(cell.x + 1, cell.y)
 
 		# down empty
-		if is_position_available(down_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(down_cell)
-		# both right and left empty
-		elif is_position_available(left_cell, next_generation_cells) and \
-			 is_position_available(right_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			var choices = [left_cell, right_cell]
-			var rand_choice = choices[randi() % len(choices)]
-			next_generation_cells.append(rand_choice)
-		# only left empty
-		elif is_position_available(left_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(left_cell)
-		# only right empty
-		elif is_position_available(right_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(right_cell)
-		# nothing happens
+		if is_cell_empty_at(down_cell):
+			if down_cell not in next_generation_cells:
+				tile_map.set_cell(MAIN_LAYER, cell, -1)
+				next_generation_cells.append(down_cell)
 		else:
-			pass
+			var occupied_cell_atlas_coord:Vector2i = tile_map.get_cell_atlas_coords(MAIN_LAYER,down_cell)
+			match ATLAS_COORD_TO_MATERIAL[occupied_cell_atlas_coord]:
+				## swap them
+				#MATERIALS.WATER:
+					#next_generation_cells.append(down_cell)
+					#tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.WATER])
+				## swap them
+				## TODO maybe custom data bool is_liquid?
+				#MATERIALS.OIL:
+					#next_generation_cells.append(down_cell)
+					#tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.OIL])
+				_:
+					# both right and left empty
+					if is_position_available(left_cell, next_generation_cells) and \
+						 is_position_available(right_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						var choices = [left_cell, right_cell]
+						var rand_choice = choices[randi() % len(choices)]
+						next_generation_cells.append(rand_choice)
+					# only left empty
+					elif is_position_available(left_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						next_generation_cells.append(left_cell)
+					# only right empty
+					elif is_position_available(right_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						next_generation_cells.append(right_cell)
+
 	return next_generation_cells
 
 # for a cell to be available needs to be empty and also not already
