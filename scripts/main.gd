@@ -19,6 +19,11 @@ const MATERIAL_TO_ATLAS_COORD:Dictionary = {
 	MATERIALS.SAND:Vector2i(0,0),
 	MATERIALS.WATER:Vector2i(0,1),
 }
+const ATLAS_COORD_TO_MATERIAL:Dictionary = {
+	Vector2i(0,2):MATERIALS.BEDROCK,
+	Vector2i(0,0):MATERIALS.SAND,
+	Vector2i(0,1):MATERIALS.WATER,
+}
 const MAIN_LAYER := 0
 
 
@@ -55,18 +60,17 @@ func _process(delta: float) -> void:
 func loop_tile_set() -> void:
 	n_steps += 1
 
+	# processing sand
 	var sand_cells = get_cells_by_material(MATERIALS.SAND)
-	var water_cells = get_cells_by_material(MATERIALS.WATER)
-	sand_label.text = "Sand: %s" % len(sand_cells)
-	water_label.text = "Water: %s" % len(water_cells)
-	#var bedrock_cells = get_cells_by_material(MATERIALS.BEDROCK)
-
 	var next_generation_sand_cells = process_cells(sand_cells, MATERIALS.SAND)
-	var next_generation_water_cells = process_cells(water_cells, MATERIALS.WATER)
-
 	set_cells_next_generation(next_generation_sand_cells, MATERIALS.SAND)
+
+	var water_cells = get_cells_by_material(MATERIALS.WATER)
+	var next_generation_water_cells = process_cells(water_cells, MATERIALS.WATER)
 	set_cells_next_generation(next_generation_water_cells, MATERIALS.WATER)
 
+	sand_label.text = "Sand: %s" % len(sand_cells)
+	water_label.text = "Water: %s" % len(water_cells)
 	#print(n_steps)
 	#print(len(sand_cells))
 	#print(len(next_generation_sand_cells))
@@ -100,27 +104,37 @@ func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]
 		var down_right_cell := Vector2i(cell.x + 1, cell.y + 1)
 
 		# down empty
-		if is_position_available(down_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(down_cell)
-		# both down right and down left empty
-		elif is_position_available(down_left_cell, next_generation_cells) and \
-			 is_position_available(down_right_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			var choices = [down_left_cell, down_right_cell]
-			var rand_choice = choices[randi() % len(choices)]
-			next_generation_cells.append(rand_choice)
-		# only down right empty
-		elif is_position_available(down_left_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(down_left_cell)
-		# only down left empty
-		elif is_position_available(down_right_cell, next_generation_cells):
-			tile_map.set_cell(MAIN_LAYER, cell, -1)
-			next_generation_cells.append(down_right_cell)
-		# nothing happens
+		if is_cell_empty_at(down_cell):
+			#this double check is stupid
+			# TODO improve this
+			if is_position_available(down_cell, next_generation_cells):
+				tile_map.set_cell(MAIN_LAYER, cell, -1)
+				next_generation_cells.append(down_cell)
+		# down cell is ocuppied
+		# by what?
 		else:
-			pass
+			var occupied_cell_atlas_coord:Vector2i = tile_map.get_cell_atlas_coords(MAIN_LAYER,down_cell)
+			match ATLAS_COORD_TO_MATERIAL[occupied_cell_atlas_coord]:
+				# swap them
+				MATERIALS.WATER:
+					next_generation_cells.append(down_cell)
+					tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.WATER])
+				_:
+					# both down right and down left empty
+					if is_position_available(down_left_cell, next_generation_cells) and \
+						 is_position_available(down_right_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						var choices = [down_left_cell, down_right_cell]
+						var rand_choice = choices[randi() % len(choices)]
+						next_generation_cells.append(rand_choice)
+					# only down right empty
+					elif is_position_available(down_left_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						next_generation_cells.append(down_left_cell)
+					# only down left empty
+					elif is_position_available(down_right_cell, next_generation_cells):
+						tile_map.set_cell(MAIN_LAYER, cell, -1)
+						next_generation_cells.append(down_right_cell)
 	return next_generation_cells
 
 func get_next_generation_water(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
@@ -159,7 +173,6 @@ func get_next_generation_water(array_of_cells:Array[Vector2i]) -> Array[Vector2i
 # taken for next generation
 func is_position_available(at_position: Vector2i, next_generation_cells: Array[Vector2i]) -> bool:
 	return is_cell_empty_at(at_position) and at_position not in next_generation_cells
-
 
 # checks if the id of the cell at cell_position is -1 (empty)
 func is_cell_empty_at(cell_position: Vector2i) -> bool :
