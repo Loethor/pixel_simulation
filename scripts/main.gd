@@ -60,7 +60,7 @@ func _process(delta: float) -> void:
 
 	# placing pixels in a square of brush_size size around mouse position
 	if Input.is_action_pressed("place"):
-		var mouse_pos = Vector2i(get_global_mouse_position())
+		var mouse_pos := Vector2i(get_global_mouse_position())
 		for i in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
 			for j in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
 				tile_map.set_cell(MAIN_LAYER,Vector2i(i,j),0,MATERIAL_TO_ATLAS_COORD[material_in_hand])
@@ -69,16 +69,16 @@ func loop_tile_set() -> void:
 	n_steps += 1
 
 	# processing sand
-	var sand_cells = get_cells_by_material(MATERIALS.SAND)
-	var next_generation_sand_cells = process_cells(sand_cells, MATERIALS.SAND)
+	var sand_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.SAND)
+	var next_generation_sand_cells: Array[Vector2i] = process_cells(sand_cells, MATERIALS.SAND)
 	set_cells_next_generation(next_generation_sand_cells, MATERIALS.SAND)
 
-	var water_cells = get_cells_by_material(MATERIALS.WATER)
-	var next_generation_water_cells = process_cells(water_cells, MATERIALS.WATER)
+	var water_cells: Array[Vector2i] = get_cells_by_material(MATERIALS.WATER)
+	var next_generation_water_cells: Array[Vector2i] = process_cells(water_cells, MATERIALS.WATER)
 	set_cells_next_generation(next_generation_water_cells, MATERIALS.WATER)
 
-	var oil_cells = get_cells_by_material(MATERIALS.OIL)
-	var next_generation_oil_cells = process_cells(oil_cells, MATERIALS.OIL)
+	var oil_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.OIL)
+	var next_generation_oil_cells:Array[Vector2i] = process_cells(oil_cells, MATERIALS.OIL)
 	set_cells_next_generation(next_generation_oil_cells, MATERIALS.OIL)
 
 	sand_label.text = "Sand: %s" % len(sand_cells)
@@ -89,6 +89,9 @@ func loop_tile_set() -> void:
 	#print(len(water_cells))
 	#print(len(next_generation_water_cells))
 	#print("")
+
+func omnipresent_function() -> void:
+	pass
 
 func get_cells_by_material(cell_material: MATERIALS) -> Array[Vector2i]:
 	return tile_map.get_used_cells_by_id(MAIN_LAYER,0, MATERIAL_TO_ATLAS_COORD[cell_material])
@@ -145,8 +148,8 @@ func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]
 					if is_position_available(down_left_cell, next_generation_cells) and \
 						 is_position_available(down_right_cell, next_generation_cells):
 						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						var choices = [down_left_cell, down_right_cell]
-						var rand_choice = choices[randi() % len(choices)]
+						var choices:Array[Vector2i] = [down_left_cell, down_right_cell]
+						var rand_choice:Vector2i = choices[randi() % len(choices)]
 						next_generation_cells.append(rand_choice)
 					# only down right empty
 					elif is_position_available(down_left_cell, next_generation_cells):
@@ -188,8 +191,8 @@ func get_next_generation_liquid(array_of_cells:Array[Vector2i]) -> Array[Vector2
 					if is_position_available(left_cell, next_generation_cells) and \
 						 is_position_available(right_cell, next_generation_cells):
 						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						var choices = [left_cell, right_cell]
-						var rand_choice = choices[randi() % len(choices)]
+						var choices:Array[Vector2i] = [left_cell, right_cell]
+						var rand_choice:Vector2i = choices[randi() % len(choices)]
 						next_generation_cells.append(rand_choice)
 					# only left empty
 					elif is_position_available(left_cell, next_generation_cells):

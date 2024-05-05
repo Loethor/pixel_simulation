@@ -15,6 +15,16 @@ run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://assets/sand_icon.png"
 
+[debug]
+
+gdscript/warnings/unassigned_variable=2
+gdscript/warnings/unassigned_variable_op_assign=2
+gdscript/warnings/shadowed_variable=2
+gdscript/warnings/unreachable_code=2
+gdscript/warnings/unreachable_pattern=2
+gdscript/warnings/untyped_declaration=2
+gdscript/warnings/inferred_declaration=1
+
 [display]
 
 window/size/viewport_width=128
