@@ -7,7 +7,6 @@
 texture = ExtResource("1_e00fl")
 texture_region_size = Vector2i(1, 1)
 0:0/0 = 0
-0:0/0/custom_data_0 = true
 0:1/0 = 0
 0:2/0 = 0
 0:3/0 = 0
@@ -15,8 +14,6 @@ texture_region_size = Vector2i(1, 1)
 
 [sub_resource type="TileSet" id="TileSet_7xm1l"]
 tile_size = Vector2i(1, 1)
-custom_data_layer_0/name = "is_falling"
-custom_data_layer_0/type = 1
 sources/0 = SubResource("TileSetAtlasSource_bgkgi")
 
 [node name="Main" type="Node2D"]

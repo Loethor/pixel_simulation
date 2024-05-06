@@ -14,6 +14,8 @@ func set_brush(value:int) -> void:
 var n_steps := 0
 
 enum MATERIALS {SAND, WATER, BEDROCK, OIL, FIRE }
+enum SOM {GRAIN, LIQUID, SOLID}
+
 const MATERIAL_TO_ATLAS_COORD:Dictionary = {
 	MATERIALS.SAND:Vector2i(0,0),
 	MATERIALS.WATER:Vector2i(0,1),
@@ -21,6 +23,7 @@ const MATERIAL_TO_ATLAS_COORD:Dictionary = {
 	MATERIALS.OIL:Vector2i(0,3),
 	MATERIALS.FIRE:Vector2i(0,4),
 }
+
 const ATLAS_COORD_TO_MATERIAL:Dictionary = {
 	Vector2i(0,0):MATERIALS.SAND,
 	Vector2i(0,1):MATERIALS.WATER,
@@ -28,6 +31,15 @@ const ATLAS_COORD_TO_MATERIAL:Dictionary = {
 	Vector2i(0,3):MATERIALS.OIL,
 	Vector2i(0,4):MATERIALS.FIRE,
 }
+
+const tile_info:Dictionary = {
+	MATERIALS.SAND:{"weight":3,"state":SOM.GRAIN},
+	MATERIALS.WATER:{"weight":2,"state":SOM.LIQUID},
+	MATERIALS.OIL:{"weight":1,"state":SOM.LIQUID},
+	MATERIALS.BEDROCK:{"weight":0,"state":SOM.SOLID},
+	MATERIALS.FIRE:{"weight":-1,"state":SOM.LIQUID},
+}
+
 const MAIN_LAYER := 0
 
 
@@ -70,15 +82,15 @@ func loop_tile_set() -> void:
 
 	# processing sand
 	var sand_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.SAND)
-	var next_generation_sand_cells: Array[Vector2i] = process_cells(sand_cells, MATERIALS.SAND)
+	var next_generation_sand_cells: Array[Vector2i] = super_get_next(sand_cells, MATERIALS.SAND)
 	set_cells_next_generation(next_generation_sand_cells, MATERIALS.SAND)
 
 	var water_cells: Array[Vector2i] = get_cells_by_material(MATERIALS.WATER)
-	var next_generation_water_cells: Array[Vector2i] = process_cells(water_cells, MATERIALS.WATER)
+	var next_generation_water_cells: Array[Vector2i] = super_get_next(water_cells, MATERIALS.WATER)
 	set_cells_next_generation(next_generation_water_cells, MATERIALS.WATER)
 
 	var oil_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.OIL)
-	var next_generation_oil_cells:Array[Vector2i] = process_cells(oil_cells, MATERIALS.OIL)
+	var next_generation_oil_cells:Array[Vector2i] = super_get_next(oil_cells, MATERIALS.OIL)
 	set_cells_next_generation(next_generation_oil_cells, MATERIALS.OIL)
 
 	sand_label.text = "Sand: %s" % len(sand_cells)
@@ -90,8 +102,23 @@ func loop_tile_set() -> void:
 	#print(len(next_generation_water_cells))
 	#print("")
 
-func omnipresent_function() -> void:
-	pass
+func super_get_next(array_of_cells:Array[Vector2i], cell_mat:MATERIALS) -> Array[Vector2i]:
+	var next_generation_cells: Array[Vector2i] = []
+	for cell in array_of_cells:
+		var down_cell := Vector2i(cell.x, cell.y + 1)
+		var down_left_cell := Vector2i(cell.x - 1, cell.y + 1)
+		var down_right_cell := Vector2i(cell.x + 1, cell.y + 1)
+		var left_cell := Vector2i(cell.x - 1, cell.y)
+		var right_cell := Vector2i(cell.x + 1, cell.y)
+
+
+		# if it is sand behave like grain
+
+		# if it is water/oil behave like liquid
+
+
+	return next_generation_cells
+
 
 func get_cells_by_material(cell_material: MATERIALS) -> Array[Vector2i]:
 	return tile_map.get_used_cells_by_id(MAIN_LAYER,0, MATERIAL_TO_ATLAS_COORD[cell_material])
@@ -114,6 +141,24 @@ func process_cells(array_of_cells:Array[Vector2i], cell_material:MATERIALS) -> A
 			pass
 
 	return next_generation_cells
+
+func get_next_generation_general(array_of_cells:Array[Vector2i], cell_mat:MATERIALS) -> Array[Vector2i]:
+	var next_generation_cells: Array[Vector2i] = []
+	for cell in array_of_cells:
+		var down_cell := Vector2i(cell.x, cell.y + 1)
+		var down_left_cell := Vector2i(cell.x - 1, cell.y + 1)
+		var down_right_cell := Vector2i(cell.x + 1, cell.y + 1)
+		var left_cell := Vector2i(cell.x - 1, cell.y)
+		var right_cell := Vector2i(cell.x + 1, cell.y)
+
+		# if it is sand behave like grain
+
+
+		# if it is water/oil behave like liquid
+
+
+	return next_generation_cells
+
 func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
 	var next_generation_cells: Array[Vector2i] = []
 
