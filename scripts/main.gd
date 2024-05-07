@@ -69,8 +69,11 @@ func loop_tile_set() -> void:
 	n_steps += 1
 
 	if state:
+		#var time_start:int = Time.get_ticks_usec()
 		calculate_next_generation()
 		update_cells()
+		#var time_end:int = Time.get_ticks_usec()
+		#print("update_enemies() took %d microseconds" % (time_end - time_start))
 
 
 func update_cells() -> void:
@@ -79,7 +82,6 @@ func update_cells() -> void:
 
 func calculate_next_generation() -> void:
 	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
-	used_cells.sort_custom(func bottom_to_top(a: Vector2i, b: Vector2i)->bool: return a[1] > b[1])
 
 	for cell: Vector2i in used_cells:
 		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
