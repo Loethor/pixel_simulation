@@ -43,6 +43,8 @@ func _input(event: InputEvent) -> void:
 		material_in_hand = Element.ELEMENT.OIL
 	if event.is_action_pressed("fire"):
 		material_in_hand = Element.ELEMENT.FIRE
+	if event.is_action_pressed("fuse"):
+		material_in_hand = Element.ELEMENT.FUSE
 	if event.is_action_pressed("show_counts"):
 		counts_panel.visible = !counts_panel.visible
 
@@ -86,8 +88,6 @@ func calculate_next_generation() -> void:
 		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
 		var cell_type: Element.SOM = cell_info["state"]
 
-		if cell_type == Element.SOM.SOLID:
-			continue
 
 		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
 			state.set_cell(cell, cell_info["decay_into"])
@@ -102,6 +102,8 @@ func calculate_next_generation() -> void:
 					if burn_info["burn_chance"] > 0.0 and randf() < burn_info["burn_chance"]:
 						state.set_cell(burn_target, burn_info["burn_into"])
 
+		if cell_type == Element.SOM.SOLID:
+			continue
 
 		var cell_weight: int = cell_info["weight"]
 		var direction: int = signi(cell_weight)
