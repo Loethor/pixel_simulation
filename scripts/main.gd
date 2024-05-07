@@ -2,56 +2,56 @@ extends Node2D
 
 # brush stuff
 @export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
-const MIN_BRUSH_SIZE := 1
-const MAX_BRUSH_SIZE := 5
-func set_brush(value:int) -> void:
+const MIN_BRUSH_SIZE: int = 1
+const MAX_BRUSH_SIZE:int = 5
+func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
-@onready var sand_label: Label = $GUI/VBoxContainer/SandLabel
-@onready var water_label: Label = $GUI/VBoxContainer/WaterLabel
+@onready var sand_label: Label = %SandLabel
+@onready var water_label: Label = %WaterLabel
+@onready var rock_label: Label = %RockLabel
+@onready var oil_label: Label = %OilLabel
+@onready var fire_label: Label = %FireLabel
 @onready var fps: Label = $GUI/FPS
-
-var n_steps := 0
-
-enum MATERIALS {SAND, WATER, BEDROCK, OIL, FIRE }
-const MATERIAL_TO_ATLAS_COORD:Dictionary = {
-	MATERIALS.SAND:Vector2i(0,0),
-	MATERIALS.WATER:Vector2i(0,1),
-	MATERIALS.BEDROCK:Vector2i(0,2),
-	MATERIALS.OIL:Vector2i(0,3),
-	MATERIALS.FIRE:Vector2i(0,4),
-}
-const ATLAS_COORD_TO_MATERIAL:Dictionary = {
-	Vector2i(0,0):MATERIALS.SAND,
-	Vector2i(0,1):MATERIALS.WATER,
-	Vector2i(0,2):MATERIALS.BEDROCK,
-	Vector2i(0,3):MATERIALS.OIL,
-	Vector2i(0,4):MATERIALS.FIRE,
-}
-const MAIN_LAYER := 0
+@onready var counts_panel: PanelContainer = %CountsPanel
 
 
-var material_in_hand: MATERIALS = MATERIALS.BEDROCK
+
+var n_steps: int = 0
+
+const MAIN_LAYER:int = 0
+
+var material_in_hand: Element.ELEMENT = Element.ELEMENT.BEDROCK
 
 @onready var tile_map: TileMap = $TileMap
+@onready var view_width: int = get_viewport().size[0]
+@onready var view_height: int = get_viewport().size[1]
 
+var state: State
+
+func _ready() -> void:
+	state = State.new(view_width, view_height, tile_map)
 
 func _input(event: InputEvent) -> void:
 
 	# changing materials with 1,2,3...
 	if event.is_action_pressed("sand"):
-		material_in_hand = MATERIALS.SAND
+		material_in_hand = Element.ELEMENT.SAND
 	if event.is_action_pressed("water"):
-		material_in_hand = MATERIALS.WATER
+		material_in_hand = Element.ELEMENT.WATER
 	if event.is_action_pressed("bedrock"):
-		material_in_hand = MATERIALS.BEDROCK
+		material_in_hand = Element.ELEMENT.BEDROCK
 	if event.is_action_pressed("oil"):
-		material_in_hand = MATERIALS.OIL
+		material_in_hand = Element.ELEMENT.OIL
 	if event.is_action_pressed("fire"):
-		material_in_hand = MATERIALS.FIRE
+		material_in_hand = Element.ELEMENT.FIRE
+	if event.is_action_pressed("show_counts"):
+		counts_panel.visible = !counts_panel.visible
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
+	if counts_panel.visible:
+		update_counts_panel()
 
 	if Input.is_action_just_pressed("increase_brush"):
 		brush_size += 1
@@ -60,161 +60,82 @@ func _process(delta: float) -> void:
 
 	# placing pixels in a square of brush_size size around mouse position
 	if Input.is_action_pressed("place"):
-		var mouse_pos := Vector2i(get_global_mouse_position())
-		for i in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
-			for j in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
-				tile_map.set_cell(MAIN_LAYER,Vector2i(i,j),0,MATERIAL_TO_ATLAS_COORD[material_in_hand])
+		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
+		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
+			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
+				state.set_cell(Vector2i(i,j), material_in_hand)
 
 func loop_tile_set() -> void:
 	n_steps += 1
 
-	# processing sand
-	var sand_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.SAND)
-	var next_generation_sand_cells: Array[Vector2i] = process_cells(sand_cells, MATERIALS.SAND)
-	set_cells_next_generation(next_generation_sand_cells, MATERIALS.SAND)
+	if state:
+		calculate_next_generation()
+		update_cells()
 
-	var water_cells: Array[Vector2i] = get_cells_by_material(MATERIALS.WATER)
-	var next_generation_water_cells: Array[Vector2i] = process_cells(water_cells, MATERIALS.WATER)
-	set_cells_next_generation(next_generation_water_cells, MATERIALS.WATER)
 
-	var oil_cells:Array[Vector2i] = get_cells_by_material(MATERIALS.OIL)
-	var next_generation_oil_cells:Array[Vector2i] = process_cells(oil_cells, MATERIALS.OIL)
-	set_cells_next_generation(next_generation_oil_cells, MATERIALS.OIL)
+func update_cells() -> void:
+	for modified_position: Vector2i in state.modified_since_last():
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Element.ELEMENT_TO_ATLAS_COORD[state.get_cell(modified_position)])
 
-	sand_label.text = "Sand: %s" % len(sand_cells)
-	water_label.text = "Water: %s" % len(water_cells)
-	#print(n_steps)
-	#print(len(sand_cells))
-	#print(len(next_generation_sand_cells))
-	#print(len(water_cells))
-	#print(len(next_generation_water_cells))
-	#print("")
+func calculate_next_generation() -> void:
+	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
+	used_cells.sort_custom(func bottom_to_top(a: Vector2i, b: Vector2i)->bool: return a[1] > b[1])
 
-func omnipresent_function() -> void:
-	pass
+	for cell: Vector2i in used_cells:
+		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
+		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
+		var cell_type: Element.SOM = cell_info["state"]
 
-func get_cells_by_material(cell_material: MATERIALS) -> Array[Vector2i]:
-	return tile_map.get_used_cells_by_id(MAIN_LAYER,0, MATERIAL_TO_ATLAS_COORD[cell_material])
+		if cell_type == Element.SOM.SOLID:
+			continue
 
-func set_cells_next_generation(next_generation_cells: Array[Vector2i], cell_material: MATERIALS) -> void:
-	for cell in next_generation_cells:
-		tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[cell_material])
+		var cell_weight: int = cell_info["weight"]
+		var direction: int = signi(cell_weight)
 
-func process_cells(array_of_cells:Array[Vector2i], cell_material:MATERIALS) -> Array[Vector2i]:
-	var next_generation_cells: Array[Vector2i] = []
+		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
 
-	match cell_material:
-		MATERIALS.SAND:
-			next_generation_cells = get_next_generation_sand(array_of_cells)
-		MATERIALS.WATER:
-			next_generation_cells = get_next_generation_liquid(array_of_cells)
-		MATERIALS.OIL:
-			next_generation_cells = get_next_generation_liquid(array_of_cells)
-		_:
-			pass
-
-	return next_generation_cells
-func get_next_generation_sand(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
-	var next_generation_cells: Array[Vector2i] = []
-
-	for cell in array_of_cells:
-		var down_cell := Vector2i(cell.x, cell.y + 1)
-		var down_left_cell := Vector2i(cell.x - 1, cell.y + 1)
-		var down_right_cell := Vector2i(cell.x + 1, cell.y + 1)
-
-		# down cell is empty
-		if is_cell_empty_at(down_cell):
-			#this double check is stupid but needed
-			# TODO improve this
-			if is_position_available(down_cell, next_generation_cells):
-				tile_map.set_cell(MAIN_LAYER, cell, -1)
-				next_generation_cells.append(down_cell)
-		# down cell is ocuppied
-		# by what?
+		# if target position is air, just swap them
+		if state.is_position_available(straight_cell):
+			state.swap_cells(straight_cell, cell)
 		else:
-			var occupied_cell_atlas_coord:Vector2i = tile_map.get_cell_atlas_coords(MAIN_LAYER,down_cell)
-			match ATLAS_COORD_TO_MATERIAL[occupied_cell_atlas_coord]:
-				# swap them
-				MATERIALS.WATER:
-					next_generation_cells.append(down_cell)
-					tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.WATER])
-				# swap them
-				# TODO maybe custom data bool is_liquid?
-				MATERIALS.OIL:
-					next_generation_cells.append(down_cell)
-					tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.OIL])
-				_:
-					# both down right and down left empty
-					if is_position_available(down_left_cell, next_generation_cells) and \
-						 is_position_available(down_right_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						var choices:Array[Vector2i] = [down_left_cell, down_right_cell]
-						var rand_choice:Vector2i = choices[randi() % len(choices)]
-						next_generation_cells.append(rand_choice)
-					# only down right empty
-					elif is_position_available(down_left_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						next_generation_cells.append(down_left_cell)
-					# only down left empty
-					elif is_position_available(down_right_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						next_generation_cells.append(down_right_cell)
-	return next_generation_cells
+			var oc_material: Element.ELEMENT = state.get_cell(straight_cell)
+			var oc_info: Dictionary = Element.ELEMENT_INFO[oc_material]
+			var oc_weight: Element.SOM = oc_info["weight"]
 
-func get_next_generation_liquid(array_of_cells:Array[Vector2i]) -> Array[Vector2i]:
-	var next_generation_cells: Array[Vector2i] = []
+			# if cell is heavier than the occupied cell and the other is not solid
+			# swap
+			if oc_weight < cell_weight and oc_info["state"] != Element.SOM.SOLID:
+				state.swap_cells(cell, straight_cell)
+			else:
+				# directional modifier if the cell is grain type
+				var grain_modifier: int = direction if cell_type == Element.SOM.GRAIN else 0
 
-	for cell in array_of_cells:
-		var down_cell := Vector2i(cell.x, cell.y + 1)
-		var left_cell := Vector2i(cell.x - 1, cell.y)
-		var right_cell := Vector2i(cell.x + 1, cell.y)
+				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
+				var left_cell_material: Element.ELEMENT = state.get_cell(left_cell)
+				var left_cell_info: Dictionary = Element.ELEMENT_INFO[left_cell_material]
 
-		# down empty
-		if is_cell_empty_at(down_cell):
-			if down_cell not in next_generation_cells:
-				tile_map.set_cell(MAIN_LAYER, cell, -1)
-				next_generation_cells.append(down_cell)
-		else:
-			var occupied_cell_atlas_coord:Vector2i = tile_map.get_cell_atlas_coords(MAIN_LAYER,down_cell)
-			match ATLAS_COORD_TO_MATERIAL[occupied_cell_atlas_coord]:
-				## swap them
-				#MATERIALS.WATER:
-					#next_generation_cells.append(down_cell)
-					#tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.WATER])
-				## swap them
-				## TODO maybe custom data bool is_liquid?
-				#MATERIALS.OIL:
-					#next_generation_cells.append(down_cell)
-					#tile_map.set_cell(MAIN_LAYER, cell, 0, MATERIAL_TO_ATLAS_COORD[MATERIALS.OIL])
-				_:
-					# both right and left empty
-					if is_position_available(left_cell, next_generation_cells) and \
-						 is_position_available(right_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						var choices:Array[Vector2i] = [left_cell, right_cell]
-						var rand_choice:Vector2i = choices[randi() % len(choices)]
-						next_generation_cells.append(rand_choice)
-					# only left empty
-					elif is_position_available(left_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						next_generation_cells.append(left_cell)
-					# only right empty
-					elif is_position_available(right_cell, next_generation_cells):
-						tile_map.set_cell(MAIN_LAYER, cell, -1)
-						next_generation_cells.append(right_cell)
+				var right_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier)
+				var right_cell_material: Element.ELEMENT = state.get_cell(right_cell)
+				var right_cell_info: Dictionary = Element.ELEMENT_INFO[right_cell_material]
 
-	return next_generation_cells
+				var available_cells: Array[Vector2i] = []
+				if left_cell_material == Element.ELEMENT.AIR or (left_cell_info["weight"] < cell_weight and left_cell_info["state"] != Element.SOM.SOLID):
+					available_cells.append(left_cell)
+				if right_cell_material == Element.ELEMENT.AIR or (right_cell_info["weight"] < cell_weight and right_cell_info["state"] != Element.SOM.SOLID):
+					available_cells.append(right_cell)
 
-# for a cell to be available needs to be empty and also not already
-# taken for next generation
-func is_position_available(at_position: Vector2i, next_generation_cells: Array[Vector2i]) -> bool:
-	return is_cell_empty_at(at_position) and at_position not in next_generation_cells
-
-# checks if the id of the cell at cell_position is -1 (empty)
-func is_cell_empty_at(cell_position: Vector2i) -> bool :
-	return tile_map.get_cell_source_id(MAIN_LAYER, cell_position) == -1
+				if available_cells.size() > 0:
+					var target_cell: Vector2i = available_cells.pick_random()
+					state.swap_cells(cell, target_cell)
 
 # used for simulation speed
 func _on_timer_timeout() -> void:
 	loop_tile_set()
 	$Timer.start()
+
+func update_counts_panel() -> void:
+	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.SAND]))
+	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.WATER]))
+	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK]))
+	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
+	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))

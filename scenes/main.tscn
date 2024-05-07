@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bw5tpsuu6pa7i"]
+[gd_scene load_steps=15 format=3 uid="uid://bw5tpsuu6pa7i"]
 
 [ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_e00fl"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_mx1ga"]
@@ -7,7 +7,6 @@
 texture = ExtResource("1_e00fl")
 texture_region_size = Vector2i(1, 1)
 0:0/0 = 0
-0:0/0/custom_data_0 = true
 0:1/0 = 0
 0:2/0 = 0
 0:3/0 = 0
@@ -15,9 +14,42 @@ texture_region_size = Vector2i(1, 1)
 
 [sub_resource type="TileSet" id="TileSet_7xm1l"]
 tile_size = Vector2i(1, 1)
-custom_data_layer_0/name = "is_falling"
-custom_data_layer_0/type = 1
 sources/0 = SubResource("TileSetAtlasSource_bgkgi")
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_j1pec"]
+load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_suo55"]
+atlas = SubResource("CompressedTexture2D_j1pec")
+region = Rect2(0, 0, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_p7o2e"]
+load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hmf2i"]
+atlas = SubResource("CompressedTexture2D_p7o2e")
+region = Rect2(0, 1, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_c2gjs"]
+load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hfcj5"]
+atlas = SubResource("CompressedTexture2D_c2gjs")
+region = Rect2(0, 2, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m2s3t"]
+load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7w245"]
+atlas = SubResource("CompressedTexture2D_m2s3t")
+region = Rect2(0, 3, 1, 1)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3478h"]
+load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_exlk1"]
+atlas = SubResource("CompressedTexture2D_3478h")
+region = Rect2(0, 4, 1, 1)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_mx1ga")
@@ -33,30 +65,118 @@ autostart = true
 
 [node name="GUI" type="CanvasLayer" parent="."]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GUI"]
+[node name="FPS" type="Label" parent="GUI"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -7.0
+offset_top = 3.0
+offset_right = -3.0
+offset_bottom = 7.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 2
+
+[node name="CountsPanel" type="PanelContainer" parent="GUI"]
+unique_name_in_owner = true
 offset_left = 3.0
 offset_top = 3.0
-offset_right = 22.0
-offset_bottom = 15.0
-size_flags_vertical = 3
+offset_right = 9.0
+offset_bottom = 29.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
-[node name="SandLabel" type="Label" parent="GUI/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="GUI/CountsPanel"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 2
-text = "Sand: x"
+theme_override_constants/margin_left = 1
+theme_override_constants/margin_top = 1
+theme_override_constants/margin_right = 1
+theme_override_constants/margin_bottom = 1
 
-[node name="WaterLabel" type="Label" parent="GUI/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="GUI/CountsPanel/MarginContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 2
-text = "Water:"
+theme_override_constants/h_separation = 1
+theme_override_constants/v_separation = 1
+columns = 2
 
-[node name="FPS" type="Label" parent="GUI"]
-offset_left = 92.0
-offset_top = 3.0
-offset_right = 132.0
-offset_bottom = 26.0
+[node name="SandTexture" type="TextureRect" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+custom_minimum_size = Vector2(1, 1)
+layout_mode = 2
+texture = SubResource("AtlasTexture_suo55")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SandLabel" type="Label" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
 theme_override_font_sizes/font_size = 2
+text = "x"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="WaterTexture" type="TextureRect" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("AtlasTexture_hmf2i")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="WaterLabel" type="Label" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 2
+text = "x"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="RockTexture" type="TextureRect" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("AtlasTexture_hfcj5")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RockLabel" type="Label" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 2
+text = "x"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="OilTexture" type="TextureRect" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("AtlasTexture_7w245")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="OilLabel" type="Label" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 2
+text = "x"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="FireTexture" type="TextureRect" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+layout_mode = 2
+texture = SubResource("AtlasTexture_exlk1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FireLabel" type="Label" parent="GUI/CountsPanel/MarginContainer/GridContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 6
+theme_override_font_sizes/font_size = 2
+text = "x"
+horizontal_alignment = 2
+vertical_alignment = 1
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
