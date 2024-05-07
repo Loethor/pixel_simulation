@@ -91,6 +91,11 @@ func calculate_next_generation() -> void:
 		if cell_type == Element.SOM.SOLID:
 			continue
 
+		var decay_prob:float = randf()
+		if decay_prob < cell_info["decay_chance"]:
+			state.set_cell(cell, Element.ELEMENT.AIR)
+			continue
+
 		var cell_weight: int = cell_info["weight"]
 		var direction: int = signi(cell_weight)
 

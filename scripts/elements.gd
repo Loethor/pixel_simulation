@@ -20,11 +20,11 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 }
 
 const ELEMENT_INFO: Dictionary = {
-	ELEMENT.AIR:{"weight":0,"state":SOM.SOLID},
-	ELEMENT.SAND:{"weight":3,"state":SOM.GRAIN},
-	ELEMENT.WATER:{"weight":2,"state":SOM.LIQUID},
-	ELEMENT.OIL:{"weight":1,"state":SOM.LIQUID},
-	ELEMENT.BEDROCK:{"weight":0,"state":SOM.SOLID},
-	ELEMENT.FIRE:{"weight":-1,"state":SOM.LIQUID},
+	ELEMENT.AIR:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0},
+	ELEMENT.SAND:{"weight":3,"state":SOM.GRAIN, "decay_chance":0.0},
+	ELEMENT.WATER:{"weight":2,"state":SOM.LIQUID, "decay_chance":0.0},
+	ELEMENT.OIL:{"weight":1,"state":SOM.LIQUID, "decay_chance":0.0},
+	ELEMENT.BEDROCK:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0},
+	ELEMENT.FIRE:{"weight":-1,"state":SOM.LIQUID, "decay_chance":0.3},
 }
 enum SOM {GRAIN, LIQUID, SOLID}
