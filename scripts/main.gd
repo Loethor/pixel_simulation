@@ -15,8 +15,6 @@ func set_brush(value: int) -> void:
 @onready var fps: Label = $GUI/FPS
 @onready var counts_panel: PanelContainer = %CountsPanel
 
-
-
 var n_steps: int = 0
 
 const MAIN_LAYER:int = 0
@@ -91,13 +89,22 @@ func calculate_next_generation() -> void:
 		if cell_type == Element.SOM.SOLID:
 			continue
 
-		var decay_prob:float = randf()
-		if decay_prob < cell_info["decay_chance"]:
-			state.set_cell(cell, Element.ELEMENT.AIR)
+		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
+			state.set_cell(cell, cell_info["decay_into"])
 			continue
+			
+		if cell_info["hot"]:
+			for dx: int in range(-1, 1, 1):
+				for dy: int in range(-1, 1, 1):
+					var burn_target: Vector2i = cell + Vector2i(dx, dy)
+					var burn_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
+					var burn_info: Dictionary = Element.ELEMENT_INFO[burn_material]
+					if burn_info["burn_chance"] > 0.0 and randf() < burn_info["burn_chance"]:
+						state.set_cell(burn_target, burn_info["burn_into"])
+			
 
 		var cell_weight: int = cell_info["weight"]
-		var direction: int = signi(cell_weight)
+		var direction: int = signi(cell_info["weight"])
 
 		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
 
