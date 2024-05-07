@@ -41,7 +41,7 @@ func swap_cells(position_a: Vector2i, position_b: Vector2i) -> void:
 func is_position_available(at_position: Vector2i) -> bool:
 	return cells[at_position[0]][at_position[1]] == Element.ELEMENT.AIR
 
-func modified_since_last() -> Array:
-	var result: Array = modified_cells.keys()
+func modified_since_last() -> Array[Vector2i]:
+	var result: Array[Vector2i] = modified_cells.keys()
 	modified_cells.clear()
 	return result

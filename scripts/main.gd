@@ -7,15 +7,17 @@ const MAX_BRUSH_SIZE:int = 5
 func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
-@onready var sand_label: Label = $GUI/VBoxContainer/SandLabel
-@onready var water_label: Label = $GUI/VBoxContainer/WaterLabel
+@onready var sand_label: Label = %SandLabel
+@onready var water_label: Label = %WaterLabel
+@onready var rock_label: Label = %RockLabel
+@onready var oil_label: Label = %OilLabel
+@onready var fire_label: Label = %FireLabel
 @onready var fps: Label = $GUI/FPS
+@onready var counts_panel: PanelContainer = %CountsPanel
+
+
 
 var n_steps: int = 0
-
-
-
-
 
 const MAIN_LAYER:int = 0
 
@@ -43,9 +45,13 @@ func _input(event: InputEvent) -> void:
 		material_in_hand = Element.ELEMENT.OIL
 	if event.is_action_pressed("fire"):
 		material_in_hand = Element.ELEMENT.FIRE
+	if event.is_action_pressed("show_counts"):
+		counts_panel.visible = !counts_panel.visible
 
 func _process(_delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
+	if counts_panel.visible:
+		update_counts_panel()
 
 	if Input.is_action_just_pressed("increase_brush"):
 		brush_size += 1
@@ -88,6 +94,7 @@ func calculate_next_generation() -> void:
 
 		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
 
+		# if target position is air, just swap them
 		if state.is_position_available(straight_cell):
 			state.swap_cells(straight_cell, cell)
 		else:
@@ -95,9 +102,12 @@ func calculate_next_generation() -> void:
 			var oc_info: Dictionary = Element.ELEMENT_INFO[oc_material]
 			var oc_weight: Element.SOM = oc_info["weight"]
 
+			# if cell is heavier than the occupied cell and the other is not solid
+			# swap
 			if oc_weight < cell_weight and oc_info["state"] != Element.SOM.SOLID:
 				state.swap_cells(cell, straight_cell)
 			else:
+				# directional modifier if the cell is grain type
 				var grain_modifier: int = direction if cell_type == Element.SOM.GRAIN else 0
 
 				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
@@ -122,3 +132,10 @@ func calculate_next_generation() -> void:
 func _on_timer_timeout() -> void:
 	loop_tile_set()
 	$Timer.start()
+
+func update_counts_panel() -> void:
+	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.SAND]))
+	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.WATER]))
+	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK]))
+	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
+	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))
