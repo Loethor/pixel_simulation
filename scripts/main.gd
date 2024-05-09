@@ -1,11 +1,17 @@
 extends Node2D
 
-# brush stuff
+const MAIN_LAYER:int = 0
+
 @export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
 const MIN_BRUSH_SIZE: int = 1
 const MAX_BRUSH_SIZE:int = 5
 func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
+
+var n_steps: int = 0
+var material_in_hand: Element.ELEMENT = Element.ELEMENT.BEDROCK
+var is_placing_blocks :bool = false
+var state: State
 
 @onready var sand_label: Label = %SandLabel
 @onready var water_label: Label = %WaterLabel
@@ -14,18 +20,10 @@ func set_brush(value: int) -> void:
 @onready var fire_label: Label = %FireLabel
 @onready var fps: Label = $GUI/FPS
 @onready var counts_panel: PanelContainer = %CountsPanel
-
-var n_steps: int = 0
-
-const MAIN_LAYER:int = 0
-
-var material_in_hand: Element.ELEMENT = Element.ELEMENT.BEDROCK
-
+@onready var hot_bar: HotBar = $GUI/HotBar
 @onready var tile_map: TileMap = $TileMap
 @onready var view_width: int = get_viewport().size[0]
 @onready var view_height: int = get_viewport().size[1]
-
-var state: State
 
 func _ready() -> void:
 	state = State.new(view_width, view_height, tile_map)
@@ -34,36 +32,48 @@ func _input(event: InputEvent) -> void:
 
 	# changing materials with 1,2,3...
 	if event.is_action_pressed("sand"):
-		material_in_hand = Element.ELEMENT.SAND
+		hot_bar.current_index = 0
 	if event.is_action_pressed("water"):
-		material_in_hand = Element.ELEMENT.WATER
+		hot_bar.current_index = 1
 	if event.is_action_pressed("bedrock"):
-		material_in_hand = Element.ELEMENT.BEDROCK
+		hot_bar.current_index = 2
 	if event.is_action_pressed("oil"):
-		material_in_hand = Element.ELEMENT.OIL
+		hot_bar.current_index = 3
 	if event.is_action_pressed("fire"):
-		material_in_hand = Element.ELEMENT.FIRE
+		hot_bar.current_index = 4
 	if event.is_action_pressed("fuse"):
-		material_in_hand = Element.ELEMENT.FUSE
+		hot_bar.current_index = 5
+
 	if event.is_action_pressed("show_counts"):
 		counts_panel.visible = !counts_panel.visible
+
+	if event.is_action_pressed("increase_brush"):
+		brush_size += 1
+	if event.is_action_pressed("decrease_brush"):
+		brush_size -= 1
+
+func _unhandled_input(event: InputEvent) -> void:
+	# placing pixels in a square of brush_size size around mouse position
+	if event.is_action_pressed("place"):
+		is_placing_blocks = true
+	if event.is_action_released("place"):
+		is_placing_blocks = false
+
 
 func _process(_delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
 	if counts_panel.visible:
 		update_counts_panel()
 
-	if Input.is_action_just_pressed("increase_brush"):
-		brush_size += 1
-	if Input.is_action_just_pressed("decrease_brush"):
-		brush_size -= 1
-
-	# placing pixels in a square of brush_size size around mouse position
-	if Input.is_action_pressed("place"):
+	if is_placing_blocks:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
 		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
 			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
 				state.set_cell(Vector2i(i,j), material_in_hand)
+
+
+
+
 
 func loop_tile_set() -> void:
 	n_steps += 1
@@ -155,3 +165,7 @@ func update_counts_panel() -> void:
 	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK]))
 	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
 	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))
+
+
+func _on_hot_bar_index_changed(current_material: Element.ELEMENT) -> void:
+	material_in_hand = current_material
