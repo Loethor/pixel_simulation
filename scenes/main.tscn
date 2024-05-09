@@ -35,28 +35,28 @@ load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ct
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hmf2i"]
 atlas = SubResource("CompressedTexture2D_p7o2e")
-region = Rect2(0, 1, 1, 1)
+region = Rect2(1, 0, 1, 1)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_c2gjs"]
 load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_hfcj5"]
 atlas = SubResource("CompressedTexture2D_c2gjs")
-region = Rect2(0, 2, 1, 1)
+region = Rect2(4, 0, 1, 1)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_m2s3t"]
 load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7w245"]
 atlas = SubResource("CompressedTexture2D_m2s3t")
-region = Rect2(0, 3, 1, 1)
+region = Rect2(3, 0, 1, 1)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3478h"]
 load_path = "res://.godot/imported/tiles.png-0d11a4bcdfb48056f67a66da241684a1.ctex"
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_exlk1"]
 atlas = SubResource("CompressedTexture2D_3478h")
-region = Rect2(0, 4, 1, 1)
+region = Rect2(2, 0, 1, 1)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_mx1ga")
@@ -91,6 +91,7 @@ offset_right = 9.0
 offset_bottom = 29.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="GUI/CountsPanel"]
 layout_mode = 2
