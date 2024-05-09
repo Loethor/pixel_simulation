@@ -42,16 +42,16 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 }
 
 const ELEMENT_INFO: Dictionary = {
-	ELEMENT.AIR:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.SAND:{"weight":3,"state":SOM.GRAIN, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.WATER:{"weight":2,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 0.5, "burn_into": ELEMENT.STEAM},
-	ELEMENT.OIL:{"weight":1,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.FIRE},
-	ELEMENT.BEDROCK:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.FIRE:{"weight":-3,"state":SOM.LIQUID, "decay_chance":0.3, "decay_into": ELEMENT.SMOKE, "hot": true, "burn_chance": 0.0},
-	ELEMENT.STEAM:{"weight":-2,"state":SOM.LIQUID, "decay_chance":0.05, "decay_into": ELEMENT.WATER, "hot": false, "burn_chance": 0.0},
-	ELEMENT.SMOKE:{"weight":-1,"state":SOM.LIQUID, "decay_chance":0.2, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 0.1, "burn_into": ELEMENT.AIR},
-	ELEMENT.FUSE:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.BURNING_FUSE},
-	ELEMENT.BURNING_FUSE:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": true, "burn_chance": 1.0, "burn_into": ELEMENT.BURNED_FUSE},
-	ELEMENT.BURNED_FUSE:{"weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 0.0},
+	ELEMENT.AIR:{"name":"Air", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
+	ELEMENT.SAND:{"name":"Sand", "weight":3,"state":SOM.GRAIN, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
+	ELEMENT.WATER:{"name":"Water", "weight":2,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 0.5, "burn_into": ELEMENT.STEAM},
+	ELEMENT.OIL:{"name":"Oil", "weight":1,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.FIRE},
+	ELEMENT.BEDROCK:{"name":"Bedrock", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
+	ELEMENT.FIRE:{"name":"Fire", "weight":-3,"state":SOM.LIQUID, "decay_chance":0.3, "decay_into": ELEMENT.SMOKE, "hot": true, "burn_chance": 0.0},
+	ELEMENT.STEAM:{"name":"Steam", "weight":-2,"state":SOM.LIQUID, "decay_chance":0.05, "decay_into": ELEMENT.WATER, "hot": false, "burn_chance": 0.0},
+	ELEMENT.SMOKE:{"name":"Smoke", "weight":-1,"state":SOM.LIQUID, "decay_chance":0.2, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 0.1, "burn_into": ELEMENT.AIR},
+	ELEMENT.FUSE:{"name":"Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.BURNING_FUSE},
+	ELEMENT.BURNING_FUSE:{"name":"Burning Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": true, "burn_chance": 1.0, "burn_into": ELEMENT.BURNED_FUSE},
+	ELEMENT.BURNED_FUSE:{"name":"Burned Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 0.0},
 }
 enum SOM {GRAIN, LIQUID, SOLID}

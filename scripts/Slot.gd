@@ -12,8 +12,10 @@ var material_of_the_button: Element.ELEMENT = Element.ELEMENT.AIR :
 			texture_normal = atlas
 			var coords:Vector2i = Element.ELEMENT_TO_ATLAS_COORD[value]
 			texture_normal.region = Rect2(coords.x, coords.y,1,1)
+			tooltip_text = Element.ELEMENT_INFO[material_of_the_button]["name"]
 		else:
 			texture_normal = RUBBER
+			tooltip_text = "Eraser"
 
 @onready var border: NinePatchRect = $Border
 
