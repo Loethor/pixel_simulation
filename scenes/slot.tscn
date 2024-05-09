@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://j581qtxojsk4"]
+[gd_scene load_steps=5 format=3 uid="uid://cn3fjwgjundmt"]
 
 [ext_resource type="Script" path="res://scripts/Slot.gd" id="1_eas2m"]
 [ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_p4o1l"]

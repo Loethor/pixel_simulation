@@ -22,8 +22,8 @@ var state: State
 @onready var counts_panel: PanelContainer = %CountsPanel
 @onready var hot_bar: HotBar = $GUI/HotBar
 @onready var tile_map: TileMap = $TileMap
-@onready var view_width: int = get_viewport().size[0]
-@onready var view_height: int = get_viewport().size[1]
+@onready var view_width: int = int(get_viewport().get_visible_rect().size[0])
+@onready var view_height: int = int(get_viewport().get_visible_rect().size[1])
 
 func _ready() -> void:
 	state = State.new(view_width, view_height, tile_map)
@@ -94,10 +94,9 @@ func calculate_next_generation() -> void:
 	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
 
 	for cell: Vector2i in used_cells:
-		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
+		var cell_material: Element.ELEMENT = state.get_cell(cell)
 		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
 		var cell_type: Element.SOM = cell_info["state"]
-
 
 		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
 			state.set_cell(cell, cell_info["decay_into"])
@@ -107,7 +106,7 @@ func calculate_next_generation() -> void:
 			for dx: int in range(-1, 2, 1):
 				for dy: int in range(-1, 2, 1):
 					var burn_target: Vector2i = cell + Vector2i(dx, dy)
-					var burn_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
+					var burn_material: Element.ELEMENT = state.get_cell(burn_target)
 					var burn_info: Dictionary = Element.ELEMENT_INFO[burn_material]
 					if burn_info["burn_chance"] > 0.0 and randf() < burn_info["burn_chance"]:
 						state.set_cell(burn_target, burn_info["burn_into"])
@@ -115,44 +114,34 @@ func calculate_next_generation() -> void:
 		if cell_type == Element.SOM.SOLID:
 			continue
 
-		var cell_weight: int = cell_info["weight"]
-		var direction: int = signi(cell_weight)
-
+		var direction: int = signi(cell_info["weight"])
+		var target_cells: Array[Vector2i] = []
+		
+		# straight target
 		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
+		if state.could_swap(cell, straight_cell):
+			for _i in range(3):
+				target_cells.append(straight_cell)
+		elif state.is_cell_modified(straight_cell):
+			target_cells.append(straight_cell)
 
-		# if target position is air, just swap them
-		if state.is_position_available(straight_cell):
-			state.swap_cells(straight_cell, cell)
-		else:
-			var oc_material: Element.ELEMENT = state.get_cell(straight_cell)
-			var oc_info: Dictionary = Element.ELEMENT_INFO[oc_material]
-			var oc_weight: Element.SOM = oc_info["weight"]
+		# diagonal targets
+		for d: int in [-1, 1]:
+			var diagonal_target: Vector2i = Vector2i(cell.x + d, cell.y + direction)
+			if state.could_swap(cell, diagonal_target):
+				target_cells.append(diagonal_target)
+		
+		# horizontal targets
+		if cell_type == Element.SOM.LIQUID:
+			for d: int in [-1, 1]:
+				var horizontal_target: Vector2i = Vector2i(cell.x + d, cell.y)
+				if state.could_swap(cell, horizontal_target):
+					for  _i in range(2):
+						target_cells.append(horizontal_target)
 
-			# if cell is heavier than the occupied cell and the other is not solid
-			# swap
-			if oc_weight < cell_weight and oc_info["state"] != Element.SOM.SOLID:
-				state.swap_cells(cell, straight_cell)
-			else:
-				# directional modifier if the cell is grain type
-				var grain_modifier: int = direction if cell_type == Element.SOM.GRAIN else 0
-
-				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
-				var left_cell_material: Element.ELEMENT = state.get_cell(left_cell)
-				var left_cell_info: Dictionary = Element.ELEMENT_INFO[left_cell_material]
-
-				var right_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier)
-				var right_cell_material: Element.ELEMENT = state.get_cell(right_cell)
-				var right_cell_info: Dictionary = Element.ELEMENT_INFO[right_cell_material]
-
-				var available_cells: Array[Vector2i] = []
-				if left_cell_material == Element.ELEMENT.AIR or (left_cell_info["weight"] < cell_weight and left_cell_info["state"] != Element.SOM.SOLID):
-					available_cells.append(left_cell)
-				if right_cell_material == Element.ELEMENT.AIR or (right_cell_info["weight"] < cell_weight and right_cell_info["state"] != Element.SOM.SOLID):
-					available_cells.append(right_cell)
-
-				if available_cells.size() > 0:
-					var target_cell: Vector2i = available_cells.pick_random()
-					state.swap_cells(cell, target_cell)
+		if target_cells.size() > 0:
+			var target_cell: Vector2i = target_cells.pick_random()
+			state.swap_cells(cell, target_cell)
 
 # used for simulation speed
 func _on_timer_timeout() -> void:

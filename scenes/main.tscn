@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_e00fl"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_mx1ga"]
-[ext_resource type="PackedScene" uid="uid://j581qtxojsk4" path="res://scenes/slot.tscn" id="3_arnb8"]
+[ext_resource type="PackedScene" uid="uid://cn3fjwgjundmt" path="res://scenes/slot.tscn" id="3_arnb8"]
 [ext_resource type="Script" path="res://scenes/HotBar.gd" id="3_so5oi"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xmlht"]
