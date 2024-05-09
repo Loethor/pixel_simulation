@@ -2,6 +2,7 @@ extends HBoxContainer
 class_name HotBar
 
 @export var slot_scene:PackedScene
+@onready var tool_tip_label: Label = $"../ToolTipLabel"
 
 signal index_changed(current_material:Element.ELEMENT)
 
@@ -53,3 +54,10 @@ func _input(event:InputEvent) -> void:
 			current_index = get_child_count() - 1
 		else:
 			current_index -= 1
+
+func update_tool_tip_label(new_text:String) -> void:
+	tool_tip_label.text = new_text
+	tool_tip_label.show()
+
+func hide_tool_tip_label() -> void:
+	tool_tip_label.hide()

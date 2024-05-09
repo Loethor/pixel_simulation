@@ -203,5 +203,18 @@ alignment = 1
 script = ExtResource("3_so5oi")
 slot_scene = ExtResource("3_arnb8")
 
+[node name="ToolTipLabel" type="Label" parent="GUI"]
+visible = false
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -2.0
+offset_top = 3.0
+offset_right = 3.0
+offset_bottom = 7.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 2
+text = "Sand"
+
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 [connection signal="index_changed" from="GUI/HotBar" to="." method="_on_hot_bar_index_changed"]
