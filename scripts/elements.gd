@@ -17,6 +17,9 @@ enum ELEMENT{
 const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(-1,-1):ELEMENT.AIR,
 	Vector2i(0,0):ELEMENT.SAND,
+	Vector2i(0,1):ELEMENT.SAND,
+	Vector2i(0,2):ELEMENT.SAND,
+	Vector2i(0,3):ELEMENT.SAND,
 	Vector2i(1,0):ELEMENT.WATER,
 	Vector2i(4,0):ELEMENT.BEDROCK,
 	Vector2i(3,0):ELEMENT.OIL,
@@ -28,17 +31,17 @@ const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(5,2):ELEMENT.BURNED_FUSE,
 }
 const ELEMENT_TO_ATLAS_COORD:Dictionary = {
-	ELEMENT.AIR:Vector2i(-1,-1),
-	ELEMENT.SAND:Vector2i(0,0),
-	ELEMENT.WATER:Vector2i(1,0),
-	ELEMENT.BEDROCK:Vector2i(4,0),
-	ELEMENT.OIL:Vector2i(3,0),
-	ELEMENT.FIRE:Vector2i(2,0),
-	ELEMENT.STEAM:Vector2i(1,1),
-	ELEMENT.SMOKE:Vector2i(2,1),
-	ELEMENT.FUSE:Vector2i(5,0),
-	ELEMENT.BURNING_FUSE:Vector2i(5,1),
-	ELEMENT.BURNED_FUSE:Vector2i(5,2),
+	ELEMENT.AIR:[Vector2i(-1,-1)],
+	ELEMENT.SAND:[Vector2i(0,0), Vector2i(0,1), Vector2i(0,2), Vector2i(0,3)],
+	ELEMENT.WATER:[Vector2i(1,0)],
+	ELEMENT.BEDROCK:[Vector2i(4,0)],
+	ELEMENT.OIL:[Vector2i(3,0)],
+	ELEMENT.FIRE:[Vector2i(2,0)],
+	ELEMENT.STEAM:[Vector2i(1,1)],
+	ELEMENT.SMOKE:[Vector2i(2,1)],
+	ELEMENT.FUSE:[Vector2i(5,0)],
+	ELEMENT.BURNING_FUSE:[Vector2i(5,1)],
+	ELEMENT.BURNED_FUSE:[Vector2i(5,2)],
 }
 
 const ELEMENT_INFO: Dictionary = {

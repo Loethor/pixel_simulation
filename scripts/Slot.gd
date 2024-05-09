@@ -12,7 +12,7 @@ var material_of_the_button: Element.ELEMENT = Element.ELEMENT.AIR :
 		material_of_the_button = value
 		if value != Element.ELEMENT.AIR:
 			texture_normal = atlas
-			var coords:Vector2i = Element.ELEMENT_TO_ATLAS_COORD[value]
+			var coords:Vector2i = Element.ELEMENT_TO_ATLAS_COORD[value][0]
 			texture_normal.region = Rect2(coords.x, coords.y,1,1)
 			tool_tip_label_text = Element.ELEMENT_INFO[material_of_the_button]["name"]
 		else:

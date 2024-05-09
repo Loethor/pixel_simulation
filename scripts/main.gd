@@ -88,7 +88,13 @@ func loop_tile_set() -> void:
 
 func update_cells() -> void:
 	for modified_position: Vector2i in state.modified_since_last():
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Element.ELEMENT_TO_ATLAS_COORD[state.get_cell(modified_position)])
+		var cell_mat: Element.ELEMENT = state.get_cell(modified_position)
+		var atlas_coords: Array = Element.ELEMENT_TO_ATLAS_COORD[cell_mat]
+		var atlas_coord: Vector2i = atlas_coords[(
+			int(sin(35*modified_position[0]+25*modified_position[1]) * 50) * 
+			int(cos(15*modified_position[1]+45*modified_position[0]) * 13)
+			) % atlas_coords.size()]
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, atlas_coord)
 
 func calculate_next_generation() -> void:
 	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
@@ -160,12 +166,11 @@ func _on_timer_timeout() -> void:
 	$Timer.start()
 
 func update_counts_panel() -> void:
-	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.SAND]))
-	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.WATER]))
-	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK]))
-	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
-	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))
-
-
+	#sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.SAND]))
+	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.WATER][0]))
+	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK][0]))
+	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL][0]))
+	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE][0]))
+	
 func _on_hot_bar_index_changed(current_material: Element.ELEMENT) -> void:
 	material_in_hand = current_material
