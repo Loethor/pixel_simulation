@@ -13,6 +13,7 @@ var material_in_hand: Element.ELEMENT = Element.ELEMENT.BEDROCK
 var is_placing_blocks :bool = false
 var state: State
 
+@onready var tool_tip_label: Label = $GUI/ToolTipLabel
 @onready var sand_label: Label = %SandLabel
 @onready var water_label: Label = %WaterLabel
 @onready var rock_label: Label = %RockLabel
@@ -27,6 +28,7 @@ var state: State
 
 func _ready() -> void:
 	state = State.new(view_width, view_height, tile_map)
+	hot_bar.scrolled.connect(flick_element_name)
 
 func _input(event: InputEvent) -> void:
 
@@ -72,9 +74,6 @@ func _process(_delta: float) -> void:
 				state.set_cell(Vector2i(i,j), material_in_hand)
 
 
-
-
-
 func loop_tile_set() -> void:
 	n_steps += 1
 
@@ -98,11 +97,20 @@ func calculate_next_generation() -> void:
 		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
 		var cell_type: Element.SOM = cell_info["state"]
 
+		# Handle generation
+		if "generates" in cell_info:
+			var down:Vector2i = cell + Vector2i(0, 1)
+			# Can be extended
+			for pos:Vector2i in [down]:
+				if state.is_position_available(pos):
+					state.set_cell(pos, cell_info["generates"])
 
+		# Handle decay
 		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
 			state.set_cell(cell, cell_info["decay_into"])
 			continue
 
+		# Handle hot
 		if cell_info["hot"]:
 			for dx: int in range(-1, 2, 1):
 				for dy: int in range(-1, 2, 1):
@@ -112,6 +120,7 @@ func calculate_next_generation() -> void:
 					if burn_info["burn_chance"] > 0.0 and randf() < burn_info["burn_chance"]:
 						state.set_cell(burn_target, burn_info["burn_into"])
 
+		# Ignore solids
 		if cell_type == Element.SOM.SOLID:
 			continue
 
@@ -120,6 +129,7 @@ func calculate_next_generation() -> void:
 
 		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
 
+		# Handle the movements
 		# if target position is air, just swap them
 		if state.is_position_available(straight_cell):
 			state.swap_cells(straight_cell, cell)
@@ -166,6 +176,11 @@ func update_counts_panel() -> void:
 	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
 	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))
 
-
 func _on_hot_bar_index_changed(current_material: Element.ELEMENT) -> void:
 	material_in_hand = current_material
+
+func flick_element_name() ->void:
+	tool_tip_label.text = Element.ELEMENT_INFO[material_in_hand]["name"]
+	tool_tip_label.show()
+	await get_tree().create_timer(.4).timeout
+	tool_tip_label.hide()
