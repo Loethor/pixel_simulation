@@ -28,6 +28,8 @@ func _ready() -> void:
 		Element.ELEMENT.FUSE,
 		Element.ELEMENT.WATER_GENERATOR,
 		Element.ELEMENT.WATER_DRAIN,
+		Element.ELEMENT.METHANE,
+		Element.ELEMENT.HONEY,
 	]
 	for slot_material:Element.ELEMENT in slot_materials:
 		var new_slot: Slot = slot_scene.instantiate()

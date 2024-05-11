@@ -108,6 +108,7 @@ func calculate_next_generation() -> void:
 				if state.get_cell(pos) == cell_info["drains"]:
 					state.set_cell(pos, Element.ELEMENT.AIR)
 					cell_info["drain_count"] += 1
+			continue
 
 		# Handle generation
 		if "generates" in cell_info:
@@ -117,6 +118,7 @@ func calculate_next_generation() -> void:
 				if state.is_position_available(pos):
 					state.set_cell(pos, cell_info["generates"])
 					cell_info["generate_count"] += 1
+			continue
 
 		# Handle decay
 		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
@@ -135,6 +137,10 @@ func calculate_next_generation() -> void:
 
 		# Ignore solids
 		if cell_type == Element.SOM.SOLID:
+			continue
+
+		# Handle viscosity
+		if "viscosity" in cell_info and randf() < cell_info["viscosity"]:
 			continue
 
 		var cell_weight: int = cell_info["weight"]
