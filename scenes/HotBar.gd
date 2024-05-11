@@ -5,6 +5,7 @@ class_name HotBar
 @onready var tool_tip_label: Label = $"../ToolTipLabel"
 
 signal index_changed(current_material:Element.ELEMENT)
+signal scrolled()
 
 var slots :Array
 var slot_materials:Array
@@ -21,10 +22,15 @@ func _ready() -> void:
 		Element.ELEMENT.AIR,
 		Element.ELEMENT.SAND,
 		Element.ELEMENT.WATER,
+		Element.ELEMENT.ICE,
 		Element.ELEMENT.BEDROCK,
 		Element.ELEMENT.OIL,
 		Element.ELEMENT.FIRE,
 		Element.ELEMENT.FUSE,
+		Element.ELEMENT.WATER_GENERATOR,
+		Element.ELEMENT.WATER_DRAIN,
+		Element.ELEMENT.METHANE,
+		Element.ELEMENT.HONEY,
 	]
 	for slot_material:Element.ELEMENT in slot_materials:
 		var new_slot: Slot = slot_scene.instantiate()
@@ -49,15 +55,13 @@ func _input(event:InputEvent) -> void:
 			current_index = 0
 		else:
 			current_index += 1
+		emit_signal("scrolled")
+
 	if event.is_action_pressed("scroll_down"):
 		if current_index == 0:
 			current_index = get_child_count() - 1
 		else:
 			current_index -= 1
+		emit_signal("scrolled")
 
-func update_tool_tip_label(new_text:String) -> void:
-	tool_tip_label.text = new_text
-	tool_tip_label.show()
 
-func hide_tool_tip_label() -> void:
-	tool_tip_label.hide()
