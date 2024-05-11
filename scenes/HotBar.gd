@@ -22,6 +22,7 @@ func _ready() -> void:
 		Element.ELEMENT.AIR,
 		Element.ELEMENT.SAND,
 		Element.ELEMENT.WATER,
+		Element.ELEMENT.ICE,
 		Element.ELEMENT.BEDROCK,
 		Element.ELEMENT.OIL,
 		Element.ELEMENT.FIRE,
