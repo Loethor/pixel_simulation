@@ -69,8 +69,8 @@ const ELEMENT_INFO: Dictionary = {
 	ELEMENT.FUSE:{"name":"Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.BURNING_FUSE},
 	ELEMENT.BURNING_FUSE:{"name":"Burning Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": true, "burn_chance": 1.0, "burn_into": ELEMENT.BURNED_FUSE},
 	ELEMENT.BURNED_FUSE:{"name":"Burned Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0},
-	ELEMENT.WATER_GENERATOR:{"name":"Water Generator", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0, "generates": ELEMENT.WATER, "generate_count":0},
-	ELEMENT.WATER_DRAIN:{"name":"Water Drain", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0, "drains": ELEMENT.WATER, "drain_count": 0},
+	ELEMENT.WATER_GENERATOR:{"name":"Water Generator", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0, "generates": ELEMENT.WATER},
+	ELEMENT.WATER_DRAIN:{"name":"Water Drain", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0, "drains": ELEMENT.WATER},
 	ELEMENT.METHANE:{"name":"Methane", "weight":-3,"state":SOM.GAS, "decay_chance":0.0,"hot": false, "burn_chance": 1.0,"burn_into": ELEMENT.FIRE},
 	ELEMENT.HONEY:{"name":"Honey", "weight":3,"state":SOM.LIQUID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0, "viscosity":0.8},
 }

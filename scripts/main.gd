@@ -107,7 +107,6 @@ func calculate_next_generation() -> void:
 			for pos:Vector2i in [down, up, left, right]:
 				if state.get_cell(pos) == cell_info["drains"]:
 					state.set_cell(pos, Element.ELEMENT.AIR)
-					cell_info["drain_count"] += 1
 			continue
 
 		# Handle generation
@@ -117,7 +116,6 @@ func calculate_next_generation() -> void:
 			for pos:Vector2i in [down]:
 				if state.is_position_available(pos):
 					state.set_cell(pos, cell_info["generates"])
-					cell_info["generate_count"] += 1
 			continue
 
 		# Handle decay
