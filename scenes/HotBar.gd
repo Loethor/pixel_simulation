@@ -27,6 +27,7 @@ func _ready() -> void:
 		Element.ELEMENT.FIRE,
 		Element.ELEMENT.FUSE,
 		Element.ELEMENT.WATER_GENERATOR,
+		Element.ELEMENT.WATER_DRAIN,
 	]
 	for slot_material:Element.ELEMENT in slot_materials:
 		var new_slot: Slot = slot_scene.instantiate()

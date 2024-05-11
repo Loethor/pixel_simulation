@@ -97,6 +97,18 @@ func calculate_next_generation() -> void:
 		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
 		var cell_type: Element.SOM = cell_info["state"]
 
+		# Handle drain
+		if "drains" in cell_info:
+			var down:Vector2i = cell + Vector2i(0, 1)
+			var up:Vector2i = cell + Vector2i(0, -1)
+			var left:Vector2i = cell + Vector2i(-1, 0)
+			var right:Vector2i = cell + Vector2i(1, 0)
+			# Can be extended
+			for pos:Vector2i in [down, up, left, right]:
+				if state.get_cell(pos) == cell_info["drains"]:
+					state.set_cell(pos, Element.ELEMENT.AIR)
+					cell_info["drain_count"] += 1
+
 		# Handle generation
 		if "generates" in cell_info:
 			var down:Vector2i = cell + Vector2i(0, 1)
@@ -104,6 +116,7 @@ func calculate_next_generation() -> void:
 			for pos:Vector2i in [down]:
 				if state.is_position_available(pos):
 					state.set_cell(pos, cell_info["generates"])
+					cell_info["generate_count"] += 1
 
 		# Handle decay
 		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
