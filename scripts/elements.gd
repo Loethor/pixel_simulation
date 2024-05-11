@@ -56,6 +56,10 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.HONEY:Vector2i(8,0),
 }
 
+const ELEMENT_TO_TEMPLATE:Dictionary = {
+	ELEMENT.WATER:preload("res://resources/elements/water.tres"),
+}
+
 const ELEMENT_INFO: Dictionary = {
 	ELEMENT.AIR:{"name":"Eraser", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
 	ELEMENT.SAND:{"name":"Sand", "weight":4,"state":SOM.GRAIN, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},

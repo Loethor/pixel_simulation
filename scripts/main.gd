@@ -94,54 +94,54 @@ func calculate_next_generation() -> void:
 
 	for cell: Vector2i in used_cells:
 		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
-		var cell_info: Dictionary = Element.ELEMENT_INFO[cell_material]
-		var cell_type: Element.SOM = cell_info["state"]
+		var cell_info: element_template = Element.ELEMENT_TO_TEMPLATE[cell_material]
+		var cell_type: Element.SOM = cell_info.state_of_matter
 
 		# Handle drain
-		if "drains" in cell_info:
+		if cell_info.is_drain:
 			var down:Vector2i = cell + Vector2i(0, 1)
 			var up:Vector2i = cell + Vector2i(0, -1)
 			var left:Vector2i = cell + Vector2i(-1, 0)
 			var right:Vector2i = cell + Vector2i(1, 0)
 			# Can be extended
 			for pos:Vector2i in [down, up, left, right]:
-				if state.get_cell(pos) == cell_info["drains"]:
+				if state.get_cell(pos) == cell_info.drains:
 					state.set_cell(pos, Element.ELEMENT.AIR)
 			continue
 
 		# Handle generation
-		if "generates" in cell_info:
+		if cell_info.is_generator in cell_info:
 			var down:Vector2i = cell + Vector2i(0, 1)
 			# Can be extended
 			for pos:Vector2i in [down]:
 				if state.is_position_available(pos):
-					state.set_cell(pos, cell_info["generates"])
+					state.set_cell(pos, cell_info.generates)
 			continue
 
 		# Handle decay
-		if cell_info["decay_chance"] > 0.0 and randf() < cell_info["decay_chance"]:
-			state.set_cell(cell, cell_info["decay_into"])
+		if cell_info.decay_chance > 0.0 and randf() < cell_info.decay_chance:
+			state.set_cell(cell, cell_info.decay_into)
 			continue
 
 		# Handle hot
-		if cell_info["hot"]:
+		if cell_info.is_hot:
 			for dx: int in range(-1, 2, 1):
 				for dy: int in range(-1, 2, 1):
 					var burn_target: Vector2i = cell + Vector2i(dx, dy)
 					var burn_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
 					var burn_info: Dictionary = Element.ELEMENT_INFO[burn_material]
-					if burn_info["burn_chance"] > 0.0 and randf() < burn_info["burn_chance"]:
-						state.set_cell(burn_target, burn_info["burn_into"])
+					if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
+						state.set_cell(burn_target, burn_info.burn_into)
 
 		# Ignore solids
 		if cell_type == Element.SOM.SOLID:
 			continue
 
 		# Handle viscosity
-		if "viscosity" in cell_info and randf() < cell_info["viscosity"]:
+		if cell_info.viscosity > 0.0 and randf() < cell_info.viscosity:
 			continue
 
-		var cell_weight: int = cell_info["weight"]
+		var cell_weight: int = cell_info.weight
 		var direction: int = signi(cell_weight)
 
 		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
@@ -153,7 +153,7 @@ func calculate_next_generation() -> void:
 		else:
 			var oc_material: Element.ELEMENT = state.get_cell(straight_cell)
 			var oc_info: Dictionary = Element.ELEMENT_INFO[oc_material]
-			var oc_weight: Element.SOM = oc_info["weight"]
+			var oc_weight: Element.SOM = oc_info.weight
 
 			# if cell is heavier than the occupied cell and the other is not solid
 			# swap

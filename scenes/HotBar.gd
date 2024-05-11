@@ -3,6 +3,7 @@ class_name HotBar
 
 @export var slot_scene:PackedScene
 @onready var tool_tip_label: Label = $"../ToolTipLabel"
+@export var elements_in_hotbar: Array[element_template]
 
 signal index_changed(current_material:Element.ELEMENT)
 signal scrolled()
@@ -13,28 +14,29 @@ var current_material:Element.ELEMENT
 var current_index: int:
 	set(value):
 		current_index = value
-		index_changed.emit(slot_materials[current_index])
+		index_changed.emit(elements_in_hotbar[current_index].element_type)
 		reset_focus()
 		set_focus()
 
 func _ready() -> void:
-	slot_materials = [
-		Element.ELEMENT.AIR,
-		Element.ELEMENT.SAND,
-		Element.ELEMENT.WATER,
-		Element.ELEMENT.ICE,
-		Element.ELEMENT.BEDROCK,
-		Element.ELEMENT.OIL,
-		Element.ELEMENT.FIRE,
-		Element.ELEMENT.FUSE,
-		Element.ELEMENT.WATER_GENERATOR,
-		Element.ELEMENT.WATER_DRAIN,
-		Element.ELEMENT.METHANE,
-		Element.ELEMENT.HONEY,
-	]
-	for slot_material:Element.ELEMENT in slot_materials:
+	#slot_materials = [
+		#Element.ELEMENT.AIR,
+		#Element.ELEMENT.SAND,
+		#Element.ELEMENT.WATER,
+		#Element.ELEMENT.ICE,
+		#Element.ELEMENT.BEDROCK,
+		#Element.ELEMENT.OIL,
+		#Element.ELEMENT.FIRE,
+		#Element.ELEMENT.FUSE,
+		#Element.ELEMENT.WATER_GENERATOR,
+		#Element.ELEMENT.WATER_DRAIN,
+		#Element.ELEMENT.METHANE,
+		#Element.ELEMENT.HONEY,
+	#]
+	for slot_material:element_template in elements_in_hotbar:
 		var new_slot: Slot = slot_scene.instantiate()
-		new_slot.material_of_the_button = slot_material
+		new_slot.texture_normal = slot_material.atlas
+		new_slot.material_of_the_button = slot_material.element_type
 		add_child(new_slot)
 	slots = get_children()
 	current_index = 0
