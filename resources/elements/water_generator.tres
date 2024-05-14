@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://c1hkwol4s03mx"]
+
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_etype"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_t51td"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rexlm"]
+atlas = ExtResource("1_etype")
+region = Rect2(6, 0, 1, 1)
+
+[resource]
+script = ExtResource("1_t51td")
+element_type = 12
+tile_map_atlas_coords = Vector2i(6, 0)
+name = "Water Generator"
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = true
+generates = 2
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_rexlm")

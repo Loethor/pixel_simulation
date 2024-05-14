@@ -9,19 +9,19 @@ region = Rect2(4, 0, 1, 1)
 
 [resource]
 script = ExtResource("1_t6xyc")
-tile_map_atlas_coords = Vector2i(0, 0)
 element_type = 4
-atlas = SubResource("AtlasTexture_2uc3x")
-name = ""
+tile_map_atlas_coords = Vector2i(4, 0)
+name = "Bedrock"
 weight = 0
 state_of_matter = 2
+viscosity = 0.0
 decay_chance = 0.0
 decay_into = 0
-viscosity = 0.0
 is_generator = false
 generates = 0
-is_drain = false
+is_drainage = false
 drains = 0
 is_hot = false
 burn_chance = 0.0
 burn_into = 0
+atlas = SubResource("AtlasTexture_2uc3x")

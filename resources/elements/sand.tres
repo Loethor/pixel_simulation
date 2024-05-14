@@ -9,19 +9,19 @@ region = Rect2(0, 0, 1, 1)
 
 [resource]
 script = ExtResource("1_rg7oj")
-tile_map_atlas_coords = Vector2i(0, 0)
 element_type = 1
-atlas = SubResource("AtlasTexture_8f8k8")
+tile_map_atlas_coords = Vector2i(0, 0)
 name = "Sand"
 weight = 4
 state_of_matter = 0
+viscosity = 0.0
 decay_chance = 0.0
 decay_into = 0
-viscosity = 0.0
 is_generator = false
 generates = 0
-is_drain = false
+is_drainage = false
 drains = 0
 is_hot = false
 burn_chance = 0.0
 burn_into = 0
+atlas = SubResource("AtlasTexture_8f8k8")

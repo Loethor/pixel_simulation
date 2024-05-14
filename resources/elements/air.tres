@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://drxx4j1r2fisf"]
+
+[ext_resource type="Texture2D" uid="uid://c8whi8kf0uml3" path="res://assets/rubber.png" id="1_hoe4j"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_knqcf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1ys0c"]
+atlas = ExtResource("1_hoe4j")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("1_knqcf")
+element_type = 0
+tile_map_atlas_coords = Vector2i(-1, -1)
+name = ""
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_1ys0c")

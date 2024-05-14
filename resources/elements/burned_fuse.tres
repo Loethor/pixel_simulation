@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://ddi3cbqt4ptxv"]
+
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_3k0tb"]
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_x1ke7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bhb1f"]
+atlas = ExtResource("1_x1ke7")
+region = Rect2(5, 2, 1, 1)
+
+[resource]
+script = ExtResource("1_3k0tb")
+element_type = 11
+tile_map_atlas_coords = Vector2i(5, 2)
+name = "Burned Fuse"
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_bhb1f")

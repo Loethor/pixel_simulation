@@ -9,7 +9,7 @@ func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
 var n_steps: int = 0
-var material_in_hand: Element.ELEMENT = Element.ELEMENT.BEDROCK
+var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.BEDROCK
 var is_placing_blocks :bool = false
 var state: State
 
@@ -28,6 +28,7 @@ var state: State
 
 func _ready() -> void:
 	state = State.new(view_width, view_height, tile_map)
+	hot_bar.index_changed.connect(_on_hot_bar_index_changed)
 	hot_bar.scrolled.connect(flick_element_name)
 
 func _input(event: InputEvent) -> void:
@@ -87,18 +88,18 @@ func loop_tile_set() -> void:
 
 func update_cells() -> void:
 	for modified_position: Vector2i in state.modified_since_last():
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Element.ELEMENT_TO_ATLAS_COORD[state.get_cell(modified_position)])
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.get_cell(modified_position)])
 
 func calculate_next_generation() -> void:
 	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
 
 	for cell: Vector2i in used_cells:
-		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
+		var cell_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
 		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
-		var cell_type: Element.SOM = cell_info.state_of_matter
+		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
 
 		# Handle drain
-		if cell_info.is_drain:
+		if cell_info.is_drainage:
 			var down:Vector2i = cell + Vector2i(0, 1)
 			var up:Vector2i = cell + Vector2i(0, -1)
 			var left:Vector2i = cell + Vector2i(-1, 0)
@@ -106,7 +107,7 @@ func calculate_next_generation() -> void:
 			# Can be extended
 			for pos:Vector2i in [down, up, left, right]:
 				if state.get_cell(pos) == cell_info.drains:
-					state.set_cell(pos, Element.ELEMENT.AIR)
+					state.set_cell(pos, Elements.ELEMENT.AIR)
 			continue
 
 		# Handle generation
@@ -128,13 +129,13 @@ func calculate_next_generation() -> void:
 			for dx: int in range(-1, 2, 1):
 				for dy: int in range(-1, 2, 1):
 					var burn_target: Vector2i = cell + Vector2i(dx, dy)
-					var burn_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
-					var burn_info: Dictionary = Element.ELEMENT_INFO[burn_material]
+					var burn_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
+					var burn_info: element_template = Elements.ELEMENT_TO_TEMPLATE[burn_material]
 					if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
 						state.set_cell(burn_target, burn_info.burn_into)
 
 		# Ignore solids
-		if cell_type == Element.SOM.SOLID:
+		if cell_type == Elements.STATE_OF_MATTER.SOLID:
 			continue
 
 		# Handle viscosity
@@ -151,30 +152,30 @@ func calculate_next_generation() -> void:
 		if state.is_position_available(straight_cell):
 			state.swap_cells(straight_cell, cell)
 		else:
-			var oc_material: Element.ELEMENT = state.get_cell(straight_cell)
-			var oc_info: Dictionary = Element.ELEMENT_INFO[oc_material]
-			var oc_weight: Element.SOM = oc_info.weight
+			var oc_material: Elements.ELEMENT = state.get_cell(straight_cell)
+			var oc_info: element_template = Elements.ELEMENT_TO_TEMPLATE[oc_material]
+			var oc_weight: int = oc_info.weight
 
 			# if cell is heavier than the occupied cell and the other is not solid
 			# swap
-			if oc_weight < cell_weight and oc_info["state"] != Element.SOM.SOLID:
+			if oc_weight < cell_weight and oc_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID:
 				state.swap_cells(cell, straight_cell)
 			else:
 				# directional modifier if the cell is grain type
-				var grain_modifier: int = direction if cell_type == Element.SOM.GRAIN else 0
+				var grain_modifier: int = direction if cell_type == Elements.STATE_OF_MATTER.GRAIN else 0
 
 				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
-				var left_cell_material: Element.ELEMENT = state.get_cell(left_cell)
-				var left_cell_info: Dictionary = Element.ELEMENT_INFO[left_cell_material]
+				var left_cell_material: Elements.ELEMENT = state.get_cell(left_cell)
+				var left_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[left_cell_material]
 
 				var right_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier)
-				var right_cell_material: Element.ELEMENT = state.get_cell(right_cell)
-				var right_cell_info: Dictionary = Element.ELEMENT_INFO[right_cell_material]
+				var right_cell_material: Elements.ELEMENT = state.get_cell(right_cell)
+				var right_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[right_cell_material]
 
 				var available_cells: Array[Vector2i] = []
-				if left_cell_material == Element.ELEMENT.AIR or (left_cell_info["weight"] < cell_weight and left_cell_info["state"] != Element.SOM.SOLID):
+				if left_cell_material == Elements.ELEMENT.AIR or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(left_cell)
-				if right_cell_material == Element.ELEMENT.AIR or (right_cell_info["weight"] < cell_weight and right_cell_info["state"] != Element.SOM.SOLID):
+				if right_cell_material == Elements.ELEMENT.AIR or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(right_cell)
 
 				if available_cells.size() > 0:
@@ -187,17 +188,18 @@ func _on_timer_timeout() -> void:
 	$Timer.start()
 
 func update_counts_panel() -> void:
-	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.SAND]))
-	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.WATER]))
-	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.BEDROCK]))
-	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.OIL]))
-	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Element.ELEMENT_TO_ATLAS_COORD[Element.ELEMENT.FIRE]))
+	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.SAND]))
+	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.WATER]))
+	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.BEDROCK]))
+	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.OIL]))
+	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.FIRE]))
 
-func _on_hot_bar_index_changed(current_material: Element.ELEMENT) -> void:
+func _on_hot_bar_index_changed(current_material: Elements.ELEMENT) -> void:
 	material_in_hand = current_material
+	print(material_in_hand)
 
 func flick_element_name() ->void:
-	tool_tip_label.text = Element.ELEMENT_INFO[material_in_hand]["name"]
+	tool_tip_label.text = Elements.ELEMENT_TO_TEMPLATE[material_in_hand].name
 	tool_tip_label.show()
 	await get_tree().create_timer(.4).timeout
 	tool_tip_label.hide()

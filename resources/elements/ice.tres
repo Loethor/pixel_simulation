@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://yggmc6gkmwt"]
+
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_d4tdn"]
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_oaydy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hkfrn"]
+atlas = ExtResource("1_oaydy")
+region = Rect2(1, 2, 1, 1)
+
+[resource]
+script = ExtResource("1_d4tdn")
+element_type = 3
+tile_map_atlas_coords = Vector2i(1, 2)
+name = "Ice"
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.5
+burn_into = 2
+atlas = SubResource("AtlasTexture_hkfrn")

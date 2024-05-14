@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://deec861d13v3"]
+
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_3l5cy"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_tdsaa"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6xxp4"]
+atlas = ExtResource("1_3l5cy")
+region = Rect2(5, 0, 1, 1)
+
+[resource]
+script = ExtResource("1_tdsaa")
+element_type = 9
+tile_map_atlas_coords = Vector2i(5, 0)
+name = "Fuse"
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 1.0
+burn_into = 10
+atlas = SubResource("AtlasTexture_6xxp4")

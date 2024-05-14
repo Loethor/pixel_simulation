@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://i713b7mjyg1d"]
+
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_j8m64"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_qmn6o"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4fl6l"]
+atlas = ExtResource("1_j8m64")
+region = Rect2(2, 1, 1, 1)
+
+[resource]
+script = ExtResource("1_qmn6o")
+element_type = 8
+tile_map_atlas_coords = Vector2i(2, 1)
+name = "Smoke"
+weight = -1
+state_of_matter = 3
+viscosity = 0.0
+decay_chance = 0.2
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_4fl6l")

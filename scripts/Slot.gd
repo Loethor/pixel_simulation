@@ -7,11 +7,11 @@ const RUBBER: Resource = preload("res://assets/rubber.png")
 var tool_tip_label_text :String = ""
 
 var atlas :AtlasTexture
-var material_of_the_button: Element.ELEMENT = Element.ELEMENT.AIR :
+var material_of_the_button: Elements.ELEMENT = Elements.ELEMENT.AIR :
 	set(value):
 		material_of_the_button = value
-		if value != Element.ELEMENT.AIR:
-			tool_tip_label_text = Element.ELEMENT_INFO[material_of_the_button]["name"]
+		if value != Elements.ELEMENT.AIR:
+			tool_tip_label_text = Elements.ELEMENT_TO_TEMPLATE[material_of_the_button].name
 		else:
 			texture_normal = RUBBER
 			tool_tip_label_text = "Eraser"
