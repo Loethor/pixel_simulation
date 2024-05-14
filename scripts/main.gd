@@ -9,7 +9,7 @@ func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
 var n_steps: int = 0
-var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.BEDROCK
+var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
 var is_placing_blocks :bool = false
 var state: State
 

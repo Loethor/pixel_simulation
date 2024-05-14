@@ -10,11 +10,8 @@ var atlas :AtlasTexture
 var material_of_the_button: Elements.ELEMENT = Elements.ELEMENT.AIR :
 	set(value):
 		material_of_the_button = value
-		if value != Elements.ELEMENT.AIR:
-			tool_tip_label_text = Elements.ELEMENT_TO_TEMPLATE[material_of_the_button].name
-		else:
-			texture_normal = RUBBER
-			tool_tip_label_text = "Eraser"
+		tool_tip_label_text = Elements.ELEMENT_TO_TEMPLATE[material_of_the_button].name
+
 
 @onready var border: NinePatchRect = $Border
 
