@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://deec861d13v3"]
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://c0innkhioihaw"]
 
 [ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_3l5cy"]
 [ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_tdsaa"]
