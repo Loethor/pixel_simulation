@@ -1,4 +1,4 @@
-extends Resource
+extends Node
 class_name Element
 
 enum ELEMENT{
@@ -56,8 +56,11 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.HONEY:Vector2i(8,0),
 }
 
-const ELEMENT_TO_TEMPLATE:Dictionary = {
+@onready var ELEMENT_TO_TEMPLATE:Dictionary = {
 	ELEMENT.WATER:preload("res://resources/elements/water.tres"),
+	ELEMENT.FIRE:preload("res://resources/elements/fire.tres"),
+	ELEMENT.SAND:preload("res://resources/elements/sand.tres"),
+	ELEMENT.BEDROCK:preload("res://resources/elements/sand.tres"),
 }
 
 const ELEMENT_INFO: Dictionary = {

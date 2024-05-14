@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://wqq7n6nmoxth"]
+
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_phwoq"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_t6xyc"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2uc3x"]
+atlas = ExtResource("1_phwoq")
+region = Rect2(4, 0, 1, 1)
+
+[resource]
+script = ExtResource("1_t6xyc")
+tile_map_atlas_coords = Vector2i(0, 0)
+element_type = 4
+atlas = SubResource("AtlasTexture_2uc3x")
+name = ""
+weight = 0
+state_of_matter = 2
+decay_chance = 0.0
+decay_into = 0
+viscosity = 0.0
+is_generator = false
+generates = 0
+is_drain = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0

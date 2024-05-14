@@ -5,19 +5,19 @@ class_name element_template
 @export var element_type:Element.ELEMENT
 @export var atlas :AtlasTexture
 
-@export_group("Properties")
+@export_group("Element Properties")
 @export var name:String
 @export var weight:int
 @export var state_of_matter:Element.SOM
 @export var decay_chance:float
 @export var decay_into:Element.ELEMENT
 @export var viscosity:float
-@export var is_generator:bool
 @export_subgroup("Generator properties")
+@export var is_generator:bool
 @export var generates:Element.ELEMENT
 @export_subgroup("")
-@export var is_drain:bool
 @export_subgroup("Drain properties")
+@export var is_drain:bool
 @export var drains:Element.ELEMENT
 @export_subgroup("Hot properties")
 @export var is_hot:bool

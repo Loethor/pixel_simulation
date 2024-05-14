@@ -94,7 +94,7 @@ func calculate_next_generation() -> void:
 
 	for cell: Vector2i in used_cells:
 		var cell_material: Element.ELEMENT = Element.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
-		var cell_info: element_template = Element.ELEMENT_TO_TEMPLATE[cell_material]
+		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
 		var cell_type: Element.SOM = cell_info.state_of_matter
 
 		# Handle drain
@@ -110,7 +110,7 @@ func calculate_next_generation() -> void:
 			continue
 
 		# Handle generation
-		if cell_info.is_generator in cell_info:
+		if cell_info.is_generator:
 			var down:Vector2i = cell + Vector2i(0, 1)
 			# Can be extended
 			for pos:Vector2i in [down]:
