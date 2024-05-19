@@ -6,23 +6,16 @@ const RUBBER: Resource = preload("res://assets/rubber.png")
 
 var tool_tip_label_text :String = ""
 
-var atlas :AtlasTexture = AtlasTexture.new()
-var material_of_the_button: Element.ELEMENT = Element.ELEMENT.AIR :
+var atlas :AtlasTexture
+var material_of_the_button: Elements.ELEMENT = Elements.ELEMENT.AIR :
 	set(value):
 		material_of_the_button = value
-		if value != Element.ELEMENT.AIR:
-			texture_normal = atlas
-			var coords:Vector2i = Element.ELEMENT_TO_ATLAS_COORD[value]
-			texture_normal.region = Rect2(coords.x, coords.y,1,1)
-			tool_tip_label_text = Element.ELEMENT_INFO[material_of_the_button]["name"]
-		else:
-			texture_normal = RUBBER
-			tool_tip_label_text = "Eraser"
+		tool_tip_label_text = Elements.ELEMENT_TO_TEMPLATE[material_of_the_button].name
+
 
 @onready var border: NinePatchRect = $Border
 
 func _ready() -> void:
-	atlas.set_atlas(TILES)
 	set_process_input(false)
 
 func _on_pressed() -> void:

@@ -1,5 +1,4 @@
-extends Resource
-class_name Element
+extends Node
 
 enum ELEMENT{
 	AIR,
@@ -19,6 +18,7 @@ enum ELEMENT{
 	METHANE,
 	HONEY,
 }
+
 const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(-1,-1):ELEMENT.AIR,
 	Vector2i(0,0):ELEMENT.SAND,
@@ -37,6 +37,7 @@ const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(7,0):ELEMENT.METHANE,
 	Vector2i(8,0):ELEMENT.HONEY,
 }
+
 const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.AIR:Vector2i(-1,-1),
 	ELEMENT.SAND:Vector2i(0,0),
@@ -56,22 +57,23 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.HONEY:Vector2i(8,0),
 }
 
-const ELEMENT_INFO: Dictionary = {
-	ELEMENT.AIR:{"name":"Eraser", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.SAND:{"name":"Sand", "weight":4,"state":SOM.GRAIN, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.WATER:{"name":"Water", "weight":2,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 0.5, "burn_into": ELEMENT.STEAM, "viscosity":0.0},
-	ELEMENT.ICE:{"name":"Ice", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.5, "burn_into": ELEMENT.WATER},
-	ELEMENT.OIL:{"name":"Oil", "weight":1,"state":SOM.LIQUID, "decay_chance":0.0, "hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.FIRE, "viscosity":0.3},
-	ELEMENT.BEDROCK:{"name":"Bedrock", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0},
-	ELEMENT.FIRE:{"name":"Fire", "weight":-3,"state":SOM.GAS, "decay_chance":0.3, "decay_into": ELEMENT.SMOKE, "hot": true, "burn_chance": 0.0},
-	ELEMENT.STEAM:{"name":"Steam", "weight":-2,"state":SOM.GAS, "decay_chance":0.05, "decay_into": ELEMENT.WATER, "hot": false, "burn_chance": 0.0},
-	ELEMENT.SMOKE:{"name":"Smoke", "weight":-1,"state":SOM.GAS, "decay_chance":0.2, "decay_into": ELEMENT.AIR, "hot": false, "burn_chance": 0.1, "burn_into": ELEMENT.AIR},
-	ELEMENT.FUSE:{"name":"Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 1.0, "burn_into": ELEMENT.BURNING_FUSE},
-	ELEMENT.BURNING_FUSE:{"name":"Burning Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": true, "burn_chance": 1.0, "burn_into": ELEMENT.BURNED_FUSE},
-	ELEMENT.BURNED_FUSE:{"name":"Burned Fuse", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0},
-	ELEMENT.WATER_GENERATOR:{"name":"Water Generator", "weight":0,"state":SOM.SOLID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0, "generates": ELEMENT.WATER},
-	ELEMENT.WATER_DRAIN:{"name":"Water Drain", "weight":0,"state":SOM.SOLID, "decay_chance":0.0, "hot": false, "burn_chance": 0.0, "drains": ELEMENT.WATER},
-	ELEMENT.METHANE:{"name":"Methane", "weight":-3,"state":SOM.GAS, "decay_chance":0.0,"hot": false, "burn_chance": 1.0,"burn_into": ELEMENT.FIRE},
-	ELEMENT.HONEY:{"name":"Honey", "weight":3,"state":SOM.LIQUID, "decay_chance":0.0,"hot": false, "burn_chance": 0.0, "viscosity":0.8},
+@onready var ELEMENT_TO_TEMPLATE:Dictionary = {
+	ELEMENT.AIR:preload("res://resources/elements/air.tres"),
+	ELEMENT.SAND:preload("res://resources/elements/sand.tres"),
+	ELEMENT.WATER:preload("res://resources/elements/water.tres"),
+	ELEMENT.ICE:preload("res://resources/elements/ice.tres"),
+	ELEMENT.BEDROCK:preload("res://resources/elements/bedrock.tres"),
+	ELEMENT.OIL:preload("res://resources/elements/oil.tres"),
+	ELEMENT.FIRE:preload("res://resources/elements/fire.tres"),
+	ELEMENT.STEAM:preload("res://resources/elements/steam.tres"),
+	ELEMENT.SMOKE:preload("res://resources/elements/smoke.tres"),
+	ELEMENT.FUSE:preload("res://resources/elements/fuse.tres"),
+	ELEMENT.BURNING_FUSE:preload("res://resources/elements/burning_fuse.tres"),
+	ELEMENT.BURNED_FUSE:preload("res://resources/elements/burned_fuse.tres"),
+	ELEMENT.WATER_GENERATOR:preload("res://resources/elements/water_generator.tres"),
+	ELEMENT.WATER_DRAIN:preload("res://resources/elements/water_drain.tres"),
+	ELEMENT.METHANE:preload("res://resources/elements/methane.tres"),
+	ELEMENT.HONEY:preload("res://resources/elements/honey.tres"),
 }
-enum SOM {GRAIN, LIQUID, SOLID, GAS}
+
+enum STATE_OF_MATTER {GRAIN, LIQUID, SOLID, GAS}

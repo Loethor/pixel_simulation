@@ -1,21 +1,11 @@
-[gd_scene load_steps=29 format=3 uid="uid://bw5tpsuu6pa7i"]
+[gd_scene load_steps=19 format=3 uid="uid://bw5tpsuu6pa7i"]
 
 [ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_e00fl"]
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_mx1ga"]
 [ext_resource type="PackedScene" uid="uid://j581qtxojsk4" path="res://scenes/slot.tscn" id="3_arnb8"]
 [ext_resource type="Script" path="res://scenes/HotBar.gd" id="3_so5oi"]
 [ext_resource type="Resource" uid="uid://bqtqat0r5ruxs" path="res://resources/elements/water.tres" id="5_8wxtq"]
-[ext_resource type="Resource" uid="uid://b30hfutowckdo" path="res://resources/elements/air.tres" id="5_e7dti"]
 [ext_resource type="Resource" uid="uid://ca3g6csr0pjsa" path="res://resources/elements/fire.tres" id="6_yw4oi"]
-[ext_resource type="Resource" uid="uid://f6yh6aee6f0j" path="res://resources/elements/sand.tres" id="7_1xog5"]
-[ext_resource type="Resource" uid="uid://wqq7n6nmoxth" path="res://resources/elements/bedrock.tres" id="8_akvt0"]
-[ext_resource type="Resource" uid="uid://c0innkhioihaw" path="res://resources/elements/fuse.tres" id="9_c5wwd"]
-[ext_resource type="Resource" uid="uid://pn5nwvxuv2op" path="res://resources/elements/honey.tres" id="10_6c3y5"]
-[ext_resource type="Resource" uid="uid://tw0sqv507x4e" path="res://resources/elements/ice.tres" id="11_01i87"]
-[ext_resource type="Resource" uid="uid://bx58ueancimdk" path="res://resources/elements/methane.tres" id="12_rbxv1"]
-[ext_resource type="Resource" uid="uid://bel5kx7t3mqax" path="res://resources/elements/oil.tres" id="13_57b1b"]
-[ext_resource type="Resource" uid="uid://bwqxsw4s3j7yy" path="res://resources/elements/water_drain.tres" id="14_47fyf"]
-[ext_resource type="Resource" uid="uid://cos57wttbfwmm" path="res://resources/elements/water_generator.tres" id="15_xic6j"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xmlht"]
 texture = ExtResource("1_e00fl")
@@ -79,6 +69,7 @@ region = Rect2(2, 0, 1, 1)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_mx1ga")
+brush_size = null
 
 [node name="TileMap" type="TileMap" parent="."]
 tile_set = SubResource("TileSet_5rd86")
@@ -219,7 +210,7 @@ theme_override_constants/separation = 1
 alignment = 1
 script = ExtResource("3_so5oi")
 slot_scene = ExtResource("3_arnb8")
-elements_in_hotbar = Array[Resource("res://resources/elements/element_template.gd")]([ExtResource("5_e7dti"), ExtResource("5_8wxtq"), ExtResource("6_yw4oi"), ExtResource("7_1xog5"), ExtResource("8_akvt0"), ExtResource("9_c5wwd"), ExtResource("10_6c3y5"), ExtResource("11_01i87"), ExtResource("12_rbxv1"), ExtResource("13_57b1b"), ExtResource("14_47fyf"), ExtResource("15_xic6j")])
+elements_in_hotbar = Array[Resource("res://resources/elements/element_template.gd")]([ExtResource("5_8wxtq"), ExtResource("6_yw4oi")])
 
 [node name="ToolTipLabel" type="Label" parent="GUI"]
 visible = false
@@ -233,3 +224,4 @@ text = "Sand"
 horizontal_alignment = 1
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="index_changed" from="GUI/HotBar" to="." method="_on_hot_bar_index_changed"]

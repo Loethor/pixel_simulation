@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://ca3g6csr0pjsa"]
+
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_wcw36"]
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_ygyjh"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q3gw0"]
+atlas = ExtResource("1_ygyjh")
+region = Rect2(2, 0, 1, 1)
+
+[resource]
+script = ExtResource("1_wcw36")
+element_type = 6
+tile_map_atlas_coords = Vector2i(2, 0)
+name = "Fire"
+weight = -3
+state_of_matter = 3
+viscosity = 0.0
+decay_chance = 0.3
+decay_into = 8
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = true
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_q3gw0")

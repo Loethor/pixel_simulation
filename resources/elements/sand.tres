@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://f6yh6aee6f0j"]
+
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_rg7oj"]
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_uxs0y"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8f8k8"]
+atlas = ExtResource("1_uxs0y")
+region = Rect2(0, 0, 1, 1)
+
+[resource]
+script = ExtResource("1_rg7oj")
+element_type = 1
+tile_map_atlas_coords = Vector2i(0, 0)
+name = "Sand"
+weight = 4
+state_of_matter = 0
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_8f8k8")
