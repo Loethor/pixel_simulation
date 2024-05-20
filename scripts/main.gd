@@ -71,18 +71,18 @@ func _process(_delta: float) -> void:
 			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
 				state.set_next_cell(Vector2i(i,j), material_in_hand)
 
-func loop_tile_set() -> void:
+func main_loop() -> void:
 	if state:
 		state.update(tile_map)
 		update_tilemap_from_state(state)
 
 func update_tilemap_from_state(_state: State) -> void:
-	for modified_position: Vector2i in _state.next_cells:
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
+	for modified_position: Vector2i in _state.current_cells:
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.current_cells[modified_position]])
 
 # used for simulation speed
 func _on_timer_timeout() -> void:
-	loop_tile_set()
+	main_loop()
 	$Timer.start()
 
 func update_counts_panel() -> void:

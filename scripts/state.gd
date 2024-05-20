@@ -8,24 +8,27 @@ var next_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 const MAIN_LAYER:int = 0
 
 func _init(tm: TileMap) -> void:
-	update_cells_from_tilemap(tm)
+	_update_cells_from_tilemap(tm)
 
 func update(tile_map:TileMap) -> void:
-	update_cells_from_tilemap(tile_map)
-	calculate_next_generation()
-	apply_modifications()
+	_update_cells_from_tilemap(tile_map)
+	_calculate_next_generation()
+	_apply_modifications()
+	_clear_next_cells()
 
-func update_cells_from_tilemap(tile_map:TileMap) -> void:
-	_clear_state()
+func _update_cells_from_tilemap(tile_map:TileMap) -> void:
+	_clear_current_cells()
 	for tile:Vector2i in tile_map.get_used_cells(MAIN_LAYER):
 		var tile_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, tile)]
 		_set_cell(tile, tile_material)
 
-func _clear_state() -> void:
+func _clear_current_cells() -> void:
 	current_cells.clear()
+
+func _clear_next_cells() -> void:
 	next_cells.clear()
 
-func calculate_next_generation() -> void:
+func _calculate_next_generation() -> void:
 
 	for cell: Vector2i in current_cells:
 		var cell_material: Elements.ELEMENT = current_cells[cell]
@@ -139,6 +142,6 @@ func _is_position_available(at_position: Vector2i) -> bool:
 func _is_position_modified(at_position: Vector2i) -> bool:
 	return next_cells.has(at_position)
 
-func apply_modifications() -> void:
+func _apply_modifications() -> void:
 	for changed_position: Vector2i in next_cells:
 		current_cells[changed_position] = next_cells[changed_position]
