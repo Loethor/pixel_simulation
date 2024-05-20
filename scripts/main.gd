@@ -173,9 +173,9 @@ func calculate_next_generation() -> void:
 				var right_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[right_cell_material]
 
 				var available_cells: Array[Vector2i] = []
-				if left_cell_material == Elements.ELEMENT.AIR or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
+				if state.is_position_available(left_cell) or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(left_cell)
-				if right_cell_material == Elements.ELEMENT.AIR or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
+				if state.is_position_available(right_cell) or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(right_cell)
 
 				if available_cells.size() > 0:
