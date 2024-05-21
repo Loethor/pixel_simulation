@@ -4,20 +4,23 @@ class_name State
 
 var current_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 var next_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
+var placed_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 
 const MAIN_LAYER:int = 0
+
+var sorted_current_cells:Array
 
 func _init(tm: TileMap) -> void:
 	_update_cells_from_tilemap(tm)
 
-func update(tile_map:TileMap) -> void:
-	_update_cells_from_tilemap(tile_map)
+func update(_tile_map:TileMap) -> void:
+	_clear_next_cells()
+	_update_next_cells_with_placed()
+	_sort_current_cells()
 	_calculate_next_generation()
 	_apply_modifications()
-	_clear_next_cells()
 
 func _update_cells_from_tilemap(tile_map:TileMap) -> void:
-	_clear_current_cells()
 	for tile:Vector2i in tile_map.get_used_cells(MAIN_LAYER):
 		var tile_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, tile)]
 		_set_cell(tile, tile_material)
@@ -28,9 +31,17 @@ func _clear_current_cells() -> void:
 func _clear_next_cells() -> void:
 	next_cells.clear()
 
-func _calculate_next_generation() -> void:
+func _sort_current_cells() -> void:
+	# maybe just use a double for loop? if i,j in dict blabla
+	# this sort is slow as fuck but gets work done...
+	# TODO improve this
+	sorted_current_cells = current_cells.keys()
+	sorted_current_cells.sort_custom(func top_to_bottom(a: Vector2i, b: Vector2i)->bool: return a[1] < b[1])
 
-	for cell: Vector2i in current_cells:
+func _calculate_next_generation() -> void:
+	# TODO you can replace sorted current cells with cells.
+	# We sort so higher Y cells are processed first, so going "down" is more probable
+	for cell: Vector2i in sorted_current_cells:
 		var cell_material: Elements.ELEMENT = current_cells[cell]
 		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
 		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
@@ -129,6 +140,9 @@ func _set_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 func set_next_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	next_cells[position] = new_material
 
+func set_placed_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
+	placed_cells[position] = new_material
+
 func _swap_cells(position_a: Vector2i, position_b: Vector2i) -> void:
 	if not _is_position_modified(position_a) and not _is_position_modified(position_b):
 		var mat_a: Elements.ELEMENT = _get_element(position_a)
@@ -141,6 +155,11 @@ func _is_position_available(at_position: Vector2i) -> bool:
 
 func _is_position_modified(at_position: Vector2i) -> bool:
 	return next_cells.has(at_position)
+
+func _update_next_cells_with_placed() -> void:
+	for changed_position: Vector2i in placed_cells:
+		next_cells[changed_position] = placed_cells[changed_position]
+	placed_cells.clear()
 
 func _apply_modifications() -> void:
 	for changed_position: Vector2i in next_cells:

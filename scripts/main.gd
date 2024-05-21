@@ -23,7 +23,6 @@ var state: State
 @onready var hot_bar: HotBar = $GUI/HotBar
 @onready var tile_map: TileMap = $TileMap
 
-
 func _ready() -> void:
 	state = State.new(tile_map)
 	hot_bar.index_changed.connect(_on_hot_bar_index_changed)
@@ -69,7 +68,7 @@ func _process(_delta: float) -> void:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
 		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
 			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
-				state.set_next_cell(Vector2i(i,j), material_in_hand)
+				state.set_placed_cell(Vector2i(i,j), material_in_hand)
 
 func main_loop() -> void:
 	if state:
@@ -77,9 +76,8 @@ func main_loop() -> void:
 		update_tilemap_from_state(state)
 
 func update_tilemap_from_state(_state: State) -> void:
-	for modified_position: Vector2i in _state.current_cells:
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.current_cells[modified_position]])
-
+	for modified_position: Vector2i in _state.next_cells:
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 # used for simulation speed
 func _on_timer_timeout() -> void:
 	main_loop()
@@ -94,7 +92,6 @@ func update_counts_panel() -> void:
 
 func _on_hot_bar_index_changed(current_material: Elements.ELEMENT) -> void:
 	material_in_hand = current_material
-	print(material_in_hand)
 
 func flick_element_name() ->void:
 	tool_tip_label.text = Elements.ELEMENT_TO_TEMPLATE[material_in_hand].name
