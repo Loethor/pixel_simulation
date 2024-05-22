@@ -7,6 +7,9 @@ var next_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 var placed_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 var still_cells: Dictionary = {} # Vector2i => null
 var cell_to_neigh: Dictionary = {} # Vector2i => Array[Vector2i]
+
+# needed because "air" is a cell that represents nothing, but this position
+# is stored in current_cells. Everything that is in current cells will be deleted
 var to_be_deleted: Dictionary = {} # Vector2i => null
 
 const MAIN_LAYER:int = 0
@@ -34,17 +37,19 @@ func _clear_next_cells() -> void:
 	next_cells.clear()
 
 func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
+	#if the values are there, cache them
 	if at_cell in cell_to_neigh:
 		return cell_to_neigh[at_cell]
 
+	# TODO maybe hardcore the 8 values instead of for loop and reuse this in the
+	# _calculate_next_generation ...
 	var neighbor_cells:Array[Vector2i] = []
 	for dx: int in range(-1, 2, 1):
 		for dy: int in range(-1, 2, 1):
 			if dx == 0 and dy == 0:
 				continue
 			var neighbor_cell: Vector2i = at_cell + Vector2i(dx, dy)
-			if  current_cells.has(neighbor_cell):
-				neighbor_cells.append(neighbor_cell)
+			neighbor_cells.append(neighbor_cell)
 
 	cell_to_neigh[at_cell] = neighbor_cells
 	return neighbor_cells
@@ -54,8 +59,8 @@ func _are_neighbors_of_same_time(as_cell:Vector2i, neighbor_cells:Array[Vector2i
 		return false
 
 	for neighbor_cell:Vector2i in neighbor_cells:
-		#TODO bug
-		if current_cells.get(neighbor_cell, 9999999999) != current_cells[as_cell]:
+		# we use get because neighbor_cell may not be in current cells
+		if current_cells.get(neighbor_cell, -1) != current_cells[as_cell]:
 			return false
 	return true
 
@@ -63,15 +68,22 @@ func _calculate_next_generation() -> void:
 	var shuffled_cells:Array = current_cells.keys()
 	shuffled_cells.shuffle()
 	for cell: Vector2i in shuffled_cells:
-		var cell_material: Elements.ELEMENT = current_cells[cell]
-		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
-		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
 
+		# still cells optimization
+		# TODO make sure everything is needed in all the dictionaries...
+		# check to_be_deleted mechanic
 		if cell not in still_cells:
 			var neighbor_cells: Array[Vector2i] = _obtain_all_cell_neighbors(cell)
 			if _are_neighbors_of_same_time(cell, neighbor_cells):
 				still_cells[cell] = null
 				continue
+		else:
+			continue
+
+		var cell_material: Elements.ELEMENT = current_cells[cell]
+		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
+		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
+
 
 		# Handle drain
 		if cell_info.is_drainage:
@@ -113,6 +125,7 @@ func _calculate_next_generation() -> void:
 
 		# Ignore solids
 		if cell_type == Elements.STATE_OF_MATTER.SOLID:
+			still_cells[cell] = null
 			continue
 
 		# Handle viscosity
@@ -181,14 +194,20 @@ func _set_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 func set_next_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	if new_material == Elements.ELEMENT.AIR:
 		to_be_deleted[position] = null
+
 	next_cells[position] = new_material
 
 	# remove neigh from still
 	for alive_cell in _obtain_all_cell_neighbors(position):
 		still_cells.erase(alive_cell)
+	still_cells.erase(position)
 
 func set_placed_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	placed_cells[position] = new_material
+
+	# air needs to be deleted from current cells
+	if new_material == Elements.ELEMENT.AIR:
+		to_be_deleted[position] = null
 
 func _swap_cells(position_a: Vector2i, position_b: Vector2i) -> void:
 	if not _is_position_modified(position_a) and not _is_position_modified(position_b):
@@ -204,10 +223,18 @@ func _is_position_modified(at_position: Vector2i) -> bool:
 	return next_cells.has(at_position)
 
 func _update_next_cells_with_placed() -> void:
-	for changed_position: Vector2i in placed_cells:
-		next_cells[changed_position] = placed_cells[changed_position]
+	for cell: Vector2i in placed_cells:
+		next_cells[cell] = placed_cells[cell]
+		if cell in still_cells:
+			still_cells.erase(cell)
 	placed_cells.clear()
 
 func _apply_modifications() -> void:
-	for changed_position: Vector2i in next_cells:
-		current_cells[changed_position] = next_cells[changed_position]
+	for cell: Vector2i in next_cells:
+		current_cells[cell] = next_cells[cell]
+
+func _remove_air_from_current() -> void:
+	for cell: Vector2i in to_be_deleted:
+		if cell in current_cells:
+			current_cells.erase(cell)
+	to_be_deleted.clear()

@@ -5,7 +5,7 @@ const DEBUG_LAYER:int = 1
 
 @export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
 const MIN_BRUSH_SIZE: int = 1
-const MAX_BRUSH_SIZE:int = 5
+const MAX_BRUSH_SIZE:int = 7
 func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
@@ -76,22 +76,15 @@ func main_loop() -> void:
 	if state:
 		state.update(tile_map)
 		update_tilemap_from_state(state)
+		state._remove_air_from_current()
 		update_stilllife_from_state(state)
 
 func update_tilemap_from_state(_state: State) -> void:
 	for modified_position: Vector2i in _state.next_cells:
 		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 
-	for cell:Vector2i in _state.to_be_deleted:
-		tile_map.erase_cell(MAIN_LAYER, cell)
-		_state.current_cells.erase(cell)
-	_state.to_be_deleted.clear()
-
 func update_stilllife_from_state(_state: State) -> void:
 	still_life.clear()
-	print("DICK")
-	print(len(_state.current_cells))
-	print(len(_state.still_cells))
 	for cell: Vector2i in _state.current_cells:
 			still_life.set_cell(MAIN_LAYER, cell, 1, Vector2i(0,0))
 	for cell: Vector2i in _state.still_cells:
