@@ -5,6 +5,9 @@ class_name State
 var current_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 var next_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
 var placed_cells: Dictionary = {}  # Vector2i => Element.ELEMENT
+var still_cells: Dictionary = {} # Vector2i => null
+var cell_to_neigh: Dictionary = {} # Vector2i => Array[Vector2i]
+var to_be_deleted: Dictionary = {} # Vector2i => null
 
 const MAIN_LAYER:int = 0
 
@@ -16,7 +19,6 @@ func _init(tm: TileMap) -> void:
 func update(_tile_map:TileMap) -> void:
 	_clear_next_cells()
 	_update_next_cells_with_placed()
-	_sort_current_cells()
 	_calculate_next_generation()
 	_apply_modifications()
 
@@ -31,20 +33,45 @@ func _clear_current_cells() -> void:
 func _clear_next_cells() -> void:
 	next_cells.clear()
 
-func _sort_current_cells() -> void:
-	# maybe just use a double for loop? if i,j in dict blabla
-	# this sort is slow as fuck but gets work done...
-	# TODO improve this
-	sorted_current_cells = current_cells.keys()
-	sorted_current_cells.sort_custom(func top_to_bottom(a: Vector2i, b: Vector2i)->bool: return a[1] < b[1])
+func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
+	if at_cell in cell_to_neigh:
+		return cell_to_neigh[at_cell]
+
+	var neighbor_cells:Array[Vector2i] = []
+	for dx: int in range(-1, 2, 1):
+		for dy: int in range(-1, 2, 1):
+			if dx == 0 and dy == 0:
+				continue
+			var neighbor_cell: Vector2i = at_cell + Vector2i(dx, dy)
+			if  current_cells.has(neighbor_cell):
+				neighbor_cells.append(neighbor_cell)
+
+	cell_to_neigh[at_cell] = neighbor_cells
+	return neighbor_cells
+
+func _are_neighbors_of_same_time(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
+	if len(neighbor_cells) < 8:
+		return false
+
+	for neighbor_cell:Vector2i in neighbor_cells:
+		#TODO bug
+		if current_cells.get(neighbor_cell, 9999999999) != current_cells[as_cell]:
+			return false
+	return true
 
 func _calculate_next_generation() -> void:
-	# TODO you can replace sorted current cells with cells.
-	# We sort so higher Y cells are processed first, so going "down" is more probable
-	for cell: Vector2i in sorted_current_cells:
+	var shuffled_cells:Array = current_cells.keys()
+	shuffled_cells.shuffle()
+	for cell: Vector2i in shuffled_cells:
 		var cell_material: Elements.ELEMENT = current_cells[cell]
 		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
 		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
+
+		if cell not in still_cells:
+			var neighbor_cells: Array[Vector2i] = _obtain_all_cell_neighbors(cell)
+			if _are_neighbors_of_same_time(cell, neighbor_cells):
+				still_cells[cell] = null
+				continue
 
 		# Handle drain
 		if cell_info.is_drainage:
@@ -112,6 +139,7 @@ func _calculate_next_generation() -> void:
 			else:
 				# directional modifier if the cell is grain type
 				var grain_modifier: int = direction if cell_type == Elements.STATE_OF_MATTER.GRAIN else 0
+				var liquid_gas_modifier: int = direction if cell_type != Elements.STATE_OF_MATTER.GRAIN else 0
 
 				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
 				var left_cell_material: Elements.ELEMENT = _get_element(left_cell)
@@ -121,11 +149,24 @@ func _calculate_next_generation() -> void:
 				var right_cell_material: Elements.ELEMENT = _get_element(right_cell)
 				var right_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[right_cell_material]
 
+				var ubleft_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier + liquid_gas_modifier )
+				var ubleft_cell_material: Elements.ELEMENT = _get_element(ubleft_cell)
+				var ubleft_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[ubleft_cell_material]
+
+				var ubright_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier + liquid_gas_modifier)
+				var ubright_cell_material: Elements.ELEMENT = _get_element(ubright_cell)
+				var ubright_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[ubright_cell_material]
+
+
 				var available_cells: Array[Vector2i] = []
 				if _is_position_available(left_cell) or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(left_cell)
 				if _is_position_available(right_cell) or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
 					available_cells.append(right_cell)
+				if _is_position_available(ubleft_cell) or (ubleft_cell_info.weight < cell_weight and ubleft_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
+					available_cells.append(ubleft_cell)
+				if _is_position_available(ubright_cell) or (ubright_cell_info.weight < cell_weight and ubright_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
+					available_cells.append(ubright_cell)
 
 				if available_cells.size() > 0:
 					var target_cell: Vector2i = available_cells.pick_random()
@@ -138,7 +179,13 @@ func _set_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	current_cells[position] = new_material
 
 func set_next_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
+	if new_material == Elements.ELEMENT.AIR:
+		to_be_deleted[position] = null
 	next_cells[position] = new_material
+
+	# remove neigh from still
+	for alive_cell in _obtain_all_cell_neighbors(position):
+		still_cells.erase(alive_cell)
 
 func set_placed_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	placed_cells[position] = new_material
