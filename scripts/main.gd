@@ -1,14 +1,16 @@
 extends Node2D
 
+# Tilemap Layer
 const MAIN_LAYER:int = 0
-const DEBUG_LAYER:int = 1
 
-@export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
+# Brush settings
 const MIN_BRUSH_SIZE: int = 1
 const MAX_BRUSH_SIZE:int = 7
+@export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
 func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
+# Current material selected to place
 var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
 var is_placing_blocks :bool = false
 var state: State
@@ -76,7 +78,6 @@ func main_loop() -> void:
 	if state:
 		state.update(tile_map)
 		update_tilemap_from_state(state)
-		state._remove_air_from_current()
 		update_stilllife_from_state(state)
 
 func update_tilemap_from_state(_state: State) -> void:
@@ -84,7 +85,10 @@ func update_tilemap_from_state(_state: State) -> void:
 		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 
 func update_stilllife_from_state(_state: State) -> void:
+	# Empty the still life tilemap
 	still_life.clear()
+
+	# Re-draw it with the current cell and still cells information
 	for cell: Vector2i in _state.current_cells:
 			still_life.set_cell(MAIN_LAYER, cell, 1, Vector2i(0,0))
 	for cell: Vector2i in _state.still_cells:

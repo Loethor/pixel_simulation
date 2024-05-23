@@ -9,32 +9,42 @@ var still_cells: Dictionary = {} # Vector2i => null
 var cell_to_neigh: Dictionary = {} # Vector2i => Array[Vector2i]
 
 # needed because "air" is a cell that represents nothing, but this position
-# is stored in current_cells. Everything that is in current cells will be deleted
+# is stored in current_cells. Everything that is in to_be_deleted will be deleted
+# from current cells
 var to_be_deleted: Dictionary = {} # Vector2i => null
 
 const MAIN_LAYER:int = 0
 
-var sorted_current_cells:Array
+enum {TOP_LEFT=0, TOP, TOP_RIGHT, LEFT, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT}
+
+var total:int = 0
+var timeA:int = 0
+var start:int = 0
+var end:int = 0
+var iter:int = 0
 
 func _init(tm: TileMap) -> void:
 	_update_cells_from_tilemap(tm)
 
 func update(_tile_map:TileMap) -> void:
+	iter+=1
 	_clear_next_cells()
 	_update_next_cells_with_placed()
+	start = Time.get_ticks_msec()
 	_calculate_next_generation()
-	_apply_modifications()
+	end = Time.get_ticks_msec()
+	total += (end-start)
+	if iter % 10 == 0:
+		print(total / 10)
+		total = 0
+	_update_current_cells_with_next_cells()
+	_remove_air_from_current()
 
+# This is done only the first time to initialize current cells
 func _update_cells_from_tilemap(tile_map:TileMap) -> void:
 	for tile:Vector2i in tile_map.get_used_cells(MAIN_LAYER):
 		var tile_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, tile)]
 		_set_cell(tile, tile_material)
-
-func _clear_current_cells() -> void:
-	current_cells.clear()
-
-func _clear_next_cells() -> void:
-	next_cells.clear()
 
 func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 	#if the values are there, cache them
@@ -44,21 +54,33 @@ func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 	# TODO maybe hardcore the 8 values instead of for loop and reuse this in the
 	# _calculate_next_generation ...
 	var neighbor_cells:Array[Vector2i] = []
-	for dx: int in range(-1, 2, 1):
-		for dy: int in range(-1, 2, 1):
-			if dx == 0 and dy == 0:
-				continue
-			var neighbor_cell: Vector2i = at_cell + Vector2i(dx, dy)
-			neighbor_cells.append(neighbor_cell)
+	# TOP_LEFT
+	neighbor_cells.append(at_cell + Vector2i(-1, -1))
+	# TOP
+	neighbor_cells.append(at_cell + Vector2i( 0, -1))
+	# TOP_RIGHT
+	neighbor_cells.append(at_cell + Vector2i( 1, -1))
+	# LEFT
+	neighbor_cells.append(at_cell + Vector2i(-1,  0))
+	# RIGHT
+	neighbor_cells.append(at_cell + Vector2i( 1,  0))
+	# BOTTOM_LEFT
+	neighbor_cells.append(at_cell + Vector2i(-1, 1))
+	# BOTTOM
+	neighbor_cells.append(at_cell + Vector2i( 0 ,1))
+	# BOTTOM_RIGHT
+	neighbor_cells.append(at_cell + Vector2i( 1, 1))
+
 
 	cell_to_neigh[at_cell] = neighbor_cells
 	return neighbor_cells
 
-func _are_neighbors_of_same_time(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
-	if len(neighbor_cells) < 8:
-		return false
+func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
 
 	for neighbor_cell:Vector2i in neighbor_cells:
+		# rocks remain still-life
+		if current_cells.get(neighbor_cell, -1) == Elements.ELEMENT.BEDROCK:
+			continue
 		# we use get because neighbor_cell may not be in current cells
 		if current_cells.get(neighbor_cell, -1) != current_cells[as_cell]:
 			return false
@@ -69,16 +91,19 @@ func _calculate_next_generation() -> void:
 	shuffled_cells.shuffle()
 	for cell: Vector2i in shuffled_cells:
 
+		# Don't process still-life cells
+		if cell in still_cells:
+			continue
+
 		# still cells optimization
 		# TODO make sure everything is needed in all the dictionaries...
 		# check to_be_deleted mechanic
-		if cell not in still_cells:
-			var neighbor_cells: Array[Vector2i] = _obtain_all_cell_neighbors(cell)
-			if _are_neighbors_of_same_time(cell, neighbor_cells):
-				still_cells[cell] = null
-				continue
-		else:
+
+		var neighbor_cells: Array[Vector2i] = _obtain_all_cell_neighbors(cell)
+		if _are_neighbors_of_same_type(cell, neighbor_cells):
+			still_cells[cell] = null
 			continue
+
 
 		var cell_material: Elements.ELEMENT = current_cells[cell]
 		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
@@ -87,23 +112,17 @@ func _calculate_next_generation() -> void:
 
 		# Handle drain
 		if cell_info.is_drainage:
-			var down:Vector2i = cell + Vector2i(0, 1)
-			var up:Vector2i = cell + Vector2i(0, -1)
-			var left:Vector2i = cell + Vector2i(-1, 0)
-			var right:Vector2i = cell + Vector2i(1, 0)
-			# Can be extended
-			for pos:Vector2i in [down, up, left, right]:
-				if _get_element(pos) == cell_info.drains:
-					set_next_cell(pos, Elements.ELEMENT.AIR)
+			var top_cell:Vector2i = neighbor_cells[TOP]
+
+			if _get_element(top_cell) == cell_info.drains:
+				set_next_cell(top_cell, Elements.ELEMENT.AIR)
 			continue
 
 		# Handle generation
 		if cell_info.is_generator:
-			var down:Vector2i = cell + Vector2i(0, 1)
-			# Can be extended
-			for pos:Vector2i in [down]:
-				if _is_position_available(pos):
-					set_next_cell(pos, cell_info.generates)
+			var bottom_cell:Vector2i = neighbor_cells[BOTTOM]
+			if _is_position_available(bottom_cell):
+				set_next_cell(bottom_cell, cell_info.generates)
 			continue
 
 		# Handle decay
@@ -113,15 +132,12 @@ func _calculate_next_generation() -> void:
 
 		# Handle hot
 		if cell_info.is_hot:
-			for dx: int in range(-1, 2, 1):
-				for dy: int in range(-1, 2, 1):
-					var burn_target: Vector2i = cell + Vector2i(dx, dy)
-
-					if current_cells.has(burn_target):
-						var burn_material: Elements.ELEMENT = current_cells[burn_target]
-						var burn_info: element_template = Elements.ELEMENT_TO_TEMPLATE[burn_material]
-						if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
-							set_next_cell(burn_target, burn_info.burn_into)
+			for burn_target: Vector2i in neighbor_cells:
+				if current_cells.has(burn_target):
+					var burn_material: Elements.ELEMENT = current_cells[burn_target]
+					var burn_info: element_template = Elements.ELEMENT_TO_TEMPLATE[burn_material]
+					if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
+						set_next_cell(burn_target, burn_info.burn_into)
 
 		# Ignore solids
 		if cell_type == Elements.STATE_OF_MATTER.SOLID:
@@ -150,36 +166,33 @@ func _calculate_next_generation() -> void:
 			if oc_weight < cell_weight and oc_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID:
 				_swap_cells(cell, straight_cell)
 			else:
-				# directional modifier if the cell is grain type
-				var grain_modifier: int = direction if cell_type == Elements.STATE_OF_MATTER.GRAIN else 0
-				var liquid_gas_modifier: int = direction if cell_type != Elements.STATE_OF_MATTER.GRAIN else 0
-
-				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
-				var left_cell_material: Elements.ELEMENT = _get_element(left_cell)
-				var left_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[left_cell_material]
-
-				var right_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier)
-				var right_cell_material: Elements.ELEMENT = _get_element(right_cell)
-				var right_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[right_cell_material]
-
-				var ubleft_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier + liquid_gas_modifier )
-				var ubleft_cell_material: Elements.ELEMENT = _get_element(ubleft_cell)
-				var ubleft_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[ubleft_cell_material]
-
-				var ubright_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier + liquid_gas_modifier)
-				var ubright_cell_material: Elements.ELEMENT = _get_element(ubright_cell)
-				var ubright_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[ubright_cell_material]
-
+				var candidate_cells: Array[Vector2i] = []
+				match cell_type:
+					Elements.STATE_OF_MATTER.GRAIN:
+						candidate_cells.append(neighbor_cells[BOTTOM_LEFT])
+						candidate_cells.append(neighbor_cells[BOTTOM_RIGHT])
+					Elements.STATE_OF_MATTER.GAS:
+						candidate_cells.append(neighbor_cells[TOP_LEFT])
+						candidate_cells.append(neighbor_cells[TOP_RIGHT])
+					Elements.STATE_OF_MATTER.LIQUID:
+						# increate water diagonal flow chance :-)
+						candidate_cells.append(neighbor_cells[BOTTOM_LEFT])
+						candidate_cells.append(neighbor_cells[BOTTOM_RIGHT])
+						candidate_cells.append(neighbor_cells[BOTTOM_LEFT])
+						candidate_cells.append(neighbor_cells[BOTTOM_RIGHT])
+						candidate_cells.append(neighbor_cells[BOTTOM_LEFT])
+						candidate_cells.append(neighbor_cells[BOTTOM_RIGHT])
+						candidate_cells.append(neighbor_cells[LEFT])
+						candidate_cells.append(neighbor_cells[RIGHT])
+					_:
+						continue
 
 				var available_cells: Array[Vector2i] = []
-				if _is_position_available(left_cell) or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(left_cell)
-				if _is_position_available(right_cell) or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(right_cell)
-				if _is_position_available(ubleft_cell) or (ubleft_cell_info.weight < cell_weight and ubleft_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(ubleft_cell)
-				if _is_position_available(ubright_cell) or (ubright_cell_info.weight < cell_weight and ubright_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(ubright_cell)
+				for candidate:Vector2i in candidate_cells:
+					var candiate_material: Elements.ELEMENT = _get_element(candidate)
+					var candiate_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[candiate_material]
+					if _is_position_candidate(candidate, candiate_cell_info.weight, cell_weight, candiate_cell_info.state_of_matter):
+						available_cells.append(candidate)
 
 				if available_cells.size() > 0:
 					var target_cell: Vector2i = available_cells.pick_random()
@@ -198,7 +211,10 @@ func set_next_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	next_cells[position] = new_material
 
 	# remove neigh from still
-	for alive_cell in _obtain_all_cell_neighbors(position):
+	for alive_cell:Vector2i in _obtain_all_cell_neighbors(position):
+		# rocks remain still-life
+		if current_cells.get(alive_cell, -1) == Elements.ELEMENT.BEDROCK:
+			continue
 		still_cells.erase(alive_cell)
 	still_cells.erase(position)
 
@@ -216,6 +232,11 @@ func _swap_cells(position_a: Vector2i, position_b: Vector2i) -> void:
 		set_next_cell(position_a, mat_b)
 		set_next_cell(position_b, mat_a)
 
+func _is_position_candidate(where: Vector2i, target_weight: int, my_weight: int, target_state:Elements.STATE_OF_MATTER) -> bool:
+	return _is_position_available(where) or \
+	 (target_weight < my_weight and target_state != Elements.STATE_OF_MATTER.SOLID)
+
+
 func _is_position_available(at_position: Vector2i) -> bool:
 	return _get_element(at_position) == Elements.ELEMENT.AIR and not _is_position_modified(at_position)
 
@@ -229,7 +250,7 @@ func _update_next_cells_with_placed() -> void:
 			still_cells.erase(cell)
 	placed_cells.clear()
 
-func _apply_modifications() -> void:
+func _update_current_cells_with_next_cells() -> void:
 	for cell: Vector2i in next_cells:
 		current_cells[cell] = next_cells[cell]
 
@@ -238,3 +259,9 @@ func _remove_air_from_current() -> void:
 		if cell in current_cells:
 			current_cells.erase(cell)
 	to_be_deleted.clear()
+
+func _clear_current_cells() -> void:
+	current_cells.clear()
+
+func _clear_next_cells() -> void:
+	next_cells.clear()
