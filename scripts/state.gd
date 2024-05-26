@@ -14,29 +14,17 @@ var cell_to_neigh: Dictionary = {} # Vector2i => Array[Vector2i]
 var to_be_deleted: Dictionary = {} # Vector2i => null
 
 const MAIN_LAYER:int = 0
-
 enum {TOP_LEFT=0, TOP, TOP_RIGHT, LEFT, RIGHT, BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT}
 
-var total:int = 0
-var timeA:int = 0
-var start:int = 0
-var end:int = 0
 var iter:int = 0
 
 func _init(tm: TileMap) -> void:
 	_update_cells_from_tilemap(tm)
 
 func update(_tile_map:TileMap) -> void:
-	iter+=1
 	_clear_next_cells()
 	_update_next_cells_with_placed()
-	start = Time.get_ticks_msec()
 	_calculate_next_generation()
-	end = Time.get_ticks_msec()
-	total += (end-start)
-	if iter % 10 == 0:
-		print(total / 10)
-		total = 0
 	_update_current_cells_with_next_cells()
 	_remove_air_from_current()
 
@@ -51,34 +39,39 @@ func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 	if at_cell in cell_to_neigh:
 		return cell_to_neigh[at_cell]
 
-	# TODO maybe hardcore the 8 values instead of for loop and reuse this in the
-	# _calculate_next_generation ...
-	var neighbor_cells:Array[Vector2i] = []
 	# TOP_LEFT
-	neighbor_cells.append(at_cell + Vector2i(-1, -1))
+	var top_left: Vector2i = at_cell + Vector2i(-1, -1)
 	# TOP
-	neighbor_cells.append(at_cell + Vector2i( 0, -1))
+	var top: Vector2i = at_cell + Vector2i( 0, -1)
 	# TOP_RIGHT
-	neighbor_cells.append(at_cell + Vector2i( 1, -1))
+	var top_right: Vector2i = at_cell + Vector2i( 1, -1)
 	# LEFT
-	neighbor_cells.append(at_cell + Vector2i(-1,  0))
+	var left: Vector2i = at_cell + Vector2i(-1,  0)
 	# RIGHT
-	neighbor_cells.append(at_cell + Vector2i( 1,  0))
+	var right: Vector2i = at_cell + Vector2i( 1,  0)
 	# BOTTOM_LEFT
-	neighbor_cells.append(at_cell + Vector2i(-1, 1))
+	var bottom_left: Vector2i = at_cell + Vector2i(-1, 1)
 	# BOTTOM
-	neighbor_cells.append(at_cell + Vector2i( 0 ,1))
+	var bottom: Vector2i = at_cell + Vector2i( 0 ,1)
 	# BOTTOM_RIGHT
-	neighbor_cells.append(at_cell + Vector2i( 1, 1))
-
+	var bottom_right: Vector2i = at_cell + Vector2i( 1, 1)
+	var neighbor_cells:Array[Vector2i] = [
+		top_left,
+		top,
+		top_right,
+		left,
+		right,
+		bottom_left,
+		bottom,
+		bottom_right
+	]
 
 	cell_to_neigh[at_cell] = neighbor_cells
 	return neighbor_cells
 
 func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
-
 	for neighbor_cell:Vector2i in neighbor_cells:
-		# rocks remain still-life
+		# rock is wildcar
 		if current_cells.get(neighbor_cell, -1) == Elements.ELEMENT.BEDROCK:
 			continue
 		# we use get because neighbor_cell may not be in current cells
@@ -91,24 +84,21 @@ func _calculate_next_generation() -> void:
 	shuffled_cells.shuffle()
 	for cell: Vector2i in shuffled_cells:
 
-		# Don't process still-life cells
-		if cell in still_cells:
-			continue
-
 		# still cells optimization
 		# TODO make sure everything is needed in all the dictionaries...
 		# check to_be_deleted mechanic
+		# Don't process still-life cells
+		if cell in still_cells:
+			continue
 
 		var neighbor_cells: Array[Vector2i] = _obtain_all_cell_neighbors(cell)
 		if _are_neighbors_of_same_type(cell, neighbor_cells):
 			still_cells[cell] = null
 			continue
 
-
 		var cell_material: Elements.ELEMENT = current_cells[cell]
 		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
 		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
-
 
 		# Handle drain
 		if cell_info.is_drainage:
@@ -199,7 +189,7 @@ func _calculate_next_generation() -> void:
 					_swap_cells(cell, target_cell)
 
 func _get_element(position: Vector2i) -> Elements.ELEMENT:
-	return current_cells[position] if current_cells.has(position) else Elements.ELEMENT.AIR
+	return current_cells.get(position,Elements.ELEMENT.AIR)
 
 func _set_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	current_cells[position] = new_material
@@ -238,7 +228,7 @@ func _is_position_candidate(where: Vector2i, target_weight: int, my_weight: int,
 
 
 func _is_position_available(at_position: Vector2i) -> bool:
-	return _get_element(at_position) == Elements.ELEMENT.AIR and not _is_position_modified(at_position)
+	return not _is_position_modified(at_position) and _get_element(at_position) == Elements.ELEMENT.AIR
 
 func _is_position_modified(at_position: Vector2i) -> bool:
 	return next_cells.has(at_position)

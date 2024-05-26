@@ -120,6 +120,7 @@ theme_override_font_sizes/font_size = 2
 
 [node name="CountsPanel" type="PanelContainer" parent="GUI"]
 unique_name_in_owner = true
+visible = false
 offset_left = 3.0
 offset_top = 3.0
 offset_right = 9.0

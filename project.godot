@@ -21,6 +21,7 @@ Elements="*res://scripts/elements.gd"
 
 [debug]
 
+settings/profiler/max_functions=65000
 gdscript/warnings/unassigned_variable=2
 gdscript/warnings/unassigned_variable_op_assign=2
 gdscript/warnings/unused_variable=2

@@ -97,7 +97,7 @@ func update_stilllife_from_state(_state: State) -> void:
 # used for simulation speed
 func _on_timer_timeout() -> void:
 	main_loop()
-	$Timer.start()
+
 
 func update_counts_panel() -> void:
 	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.SAND]))
