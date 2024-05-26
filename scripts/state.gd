@@ -70,6 +70,9 @@ func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 	return neighbor_cells
 
 func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
+	# do not consider neighbours the same when a cell has been changed within this timeframe
+	if (next_cells[as_cell] != current_cells[as_cell] if as_cell in next_cells else false):
+		return false
 	for neighbor_cell:Vector2i in neighbor_cells:
 		# rock is wildcar
 		if current_cells.get(neighbor_cell, -1) == Elements.ELEMENT.BEDROCK:
