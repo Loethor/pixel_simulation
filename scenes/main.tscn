@@ -16,7 +16,7 @@
 [ext_resource type="Resource" uid="uid://bel5kx7t3mqax" path="res://resources/elements/oil.tres" id="13_57b1b"]
 [ext_resource type="Resource" uid="uid://bwqxsw4s3j7yy" path="res://resources/elements/water_drain.tres" id="14_47fyf"]
 [ext_resource type="Resource" uid="uid://cos57wttbfwmm" path="res://resources/elements/water_generator.tres" id="15_xic6j"]
-[ext_resource type="Texture2D" uid="uid://b2tpymwcfy3bx" path="res://assets/deadalive.png" id="17_7rekr"]
+[ext_resource type="Texture2D" uid="uid://d3yvt6u4ebmbe" path="res://assets/deadalive.png" id="17_7rekr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_xmlht"]
 texture = ExtResource("1_e00fl")

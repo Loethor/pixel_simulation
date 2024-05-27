@@ -70,15 +70,22 @@ func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 	return neighbor_cells
 
 func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
+
 	# do not consider neighbours the same when a cell has been changed within this timeframe
 	if (next_cells[as_cell] != current_cells[as_cell] if as_cell in next_cells else false):
 		return false
 	for neighbor_cell:Vector2i in neighbor_cells:
+		var neighbor_element: Elements.ELEMENT = current_cells.get(neighbor_cell, Elements.ELEMENT.AIR)
+
+		# if `as_cell` has at least 1 AIR as neighbor, it should be alive (returning false)
+		if neighbor_element == Elements.ELEMENT.AIR:
+			return false
+
 		# rock is wildcar
-		if current_cells.get(neighbor_cell, -1) == Elements.ELEMENT.BEDROCK:
+		if neighbor_element == Elements.ELEMENT.BEDROCK:
 			continue
 		# we use get because neighbor_cell may not be in current cells
-		if current_cells.get(neighbor_cell, -1) != current_cells[as_cell]:
+		if neighbor_element != current_cells[as_cell]:
 			return false
 	return true
 
@@ -167,6 +174,8 @@ func _calculate_next_generation() -> void:
 					Elements.STATE_OF_MATTER.GAS:
 						candidate_cells.append(neighbor_cells[TOP_LEFT])
 						candidate_cells.append(neighbor_cells[TOP_RIGHT])
+						candidate_cells.append(neighbor_cells[LEFT])
+						candidate_cells.append(neighbor_cells[RIGHT])
 					Elements.STATE_OF_MATTER.LIQUID:
 						# increate water diagonal flow chance :-)
 						candidate_cells.append(neighbor_cells[BOTTOM_LEFT])
