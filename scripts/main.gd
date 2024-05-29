@@ -80,11 +80,15 @@ func main_loop() -> void:
 		update_tilemap_from_state(state)
 		update_stilllife_from_state(state)
 
+
 func update_tilemap_from_state(_state: State) -> void:
 	for modified_position: Vector2i in _state.next_cells:
 		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 
 func update_stilllife_from_state(_state: State) -> void:
+	if still_life.visible == false:
+		return
+
 	# Empty the still life tilemap
 	still_life.clear()
 
@@ -97,7 +101,6 @@ func update_stilllife_from_state(_state: State) -> void:
 # used for simulation speed
 func _on_timer_timeout() -> void:
 	main_loop()
-
 
 func update_counts_panel() -> void:
 	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.SAND]))

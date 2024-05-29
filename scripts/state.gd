@@ -28,6 +28,7 @@ func update(_tile_map:TileMap) -> void:
 	_update_current_cells_with_next_cells()
 	_remove_air_from_current()
 
+
 # This is done only the first time to initialize current cells
 func _update_cells_from_tilemap(tile_map:TileMap) -> void:
 	for tile:Vector2i in tile_map.get_used_cells(MAIN_LAYER):
@@ -125,23 +126,25 @@ func _calculate_next_generation() -> void:
 				set_next_cell(bottom_cell, cell_info.generates)
 			continue
 
-		# Handle decay
-		if cell_info.decay_chance > 0.0 and randf() < cell_info.decay_chance:
-			set_next_cell(cell, cell_info.decay_into)
-			continue
 
 		# Handle hot
 		if cell_info.is_hot:
 			for burn_target: Vector2i in neighbor_cells:
-				if current_cells.has(burn_target):
+				if current_cells.has(burn_target) and not _is_position_modified(burn_target):
 					var burn_material: Elements.ELEMENT = current_cells[burn_target]
 					var burn_info: element_template = Elements.ELEMENT_TO_TEMPLATE[burn_material]
 					if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
 						set_next_cell(burn_target, burn_info.burn_into)
 
+		# Handle decay
+		if cell_info.decay_chance > 0.0 and randf() < cell_info.decay_chance:
+			set_next_cell(cell, cell_info.decay_into)
+			continue
+
 		# Ignore solids
 		if cell_type == Elements.STATE_OF_MATTER.SOLID:
-			still_cells[cell] = null
+			if cell_material == Elements.ELEMENT.BEDROCK:
+				still_cells[cell] = null
 			continue
 
 		# Handle viscosity
@@ -248,6 +251,9 @@ func _is_position_modified(at_position: Vector2i) -> bool:
 func _update_next_cells_with_placed() -> void:
 	for cell: Vector2i in placed_cells:
 		next_cells[cell] = placed_cells[cell]
+		for nei: Vector2i in _obtain_all_cell_neighbors(cell):
+			if nei in still_cells:
+				still_cells.erase(nei)
 		if cell in still_cells:
 			still_cells.erase(cell)
 	placed_cells.clear()
@@ -258,6 +264,8 @@ func _update_current_cells_with_next_cells() -> void:
 
 func _remove_air_from_current() -> void:
 	for cell: Vector2i in to_be_deleted:
+		if cell in still_cells:
+			still_cells.erase(cell)
 		if cell in current_cells:
 			current_cells.erase(cell)
 	to_be_deleted.clear()
