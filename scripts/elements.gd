@@ -18,6 +18,8 @@ enum ELEMENT{
 	METHANE,
 	HONEY,
 }
+func print_element(element: ELEMENT) -> void:
+	print(Elements.ELEMENT.keys()[element])
 
 const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(-1,-1):ELEMENT.AIR,
@@ -77,3 +79,5 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 }
 
 enum STATE_OF_MATTER {GRAIN, LIQUID, SOLID, GAS}
+func print_state_of_matter(state_of_matter: STATE_OF_MATTER) -> void:
+	print(Elements.STATE_OF_MATTER.keys()[state_of_matter])

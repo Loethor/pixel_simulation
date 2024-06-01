@@ -14,7 +14,6 @@ var current_material:Elements.ELEMENT
 var current_index: int:
 	set(value):
 		current_index = value
-		print(elements_in_hotbar[current_index].element_type)
 		index_changed.emit(elements_in_hotbar[current_index].element_type)
 		reset_focus()
 		set_focus()

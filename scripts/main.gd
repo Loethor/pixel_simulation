@@ -1,14 +1,16 @@
 extends Node2D
 
+# Tilemap Layer
 const MAIN_LAYER:int = 0
 
-@export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
+# Brush settings
 const MIN_BRUSH_SIZE: int = 1
-const MAX_BRUSH_SIZE:int = 5
+const MAX_BRUSH_SIZE:int = 7
+@export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
 func set_brush(value: int) -> void:
 	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
 
-var n_steps: int = 0
+# Current material selected to place
 var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
 var is_placing_blocks :bool = false
 var state: State
@@ -23,11 +25,10 @@ var state: State
 @onready var counts_panel: PanelContainer = %CountsPanel
 @onready var hot_bar: HotBar = $GUI/HotBar
 @onready var tile_map: TileMap = $TileMap
-@onready var view_width: int = get_viewport().size[0]
-@onready var view_height: int = get_viewport().size[1]
+@onready var still_life: TileMap = $StillLife
 
 func _ready() -> void:
-	state = State.new(view_width, view_height, tile_map)
+	state = State.new(tile_map)
 	hot_bar.index_changed.connect(_on_hot_bar_index_changed)
 	hot_bar.scrolled.connect(flick_element_name)
 
@@ -62,7 +63,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_released("place"):
 		is_placing_blocks = false
 
-
 func _process(_delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
 	if counts_panel.visible:
@@ -72,120 +72,35 @@ func _process(_delta: float) -> void:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
 		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
 			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
-				state.set_cell(Vector2i(i,j), material_in_hand)
+				state.set_placed_cell(Vector2i(i,j), material_in_hand)
 
-
-func loop_tile_set() -> void:
-	n_steps += 1
-
+func main_loop() -> void:
 	if state:
-		#var time_start:int = Time.get_ticks_usec()
-		calculate_next_generation()
-		update_cells()
-		#var time_end:int = Time.get_ticks_usec()
-		#print("update_enemies() took %d microseconds" % (time_end - time_start))
+		state.update(tile_map)
+		update_tilemap_from_state(state)
+		update_stilllife_from_state(state)
 
 
-func update_cells() -> void:
-	for modified_position: Vector2i in state.modified_since_last():
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.get_cell(modified_position)])
+func update_tilemap_from_state(_state: State) -> void:
+	for modified_position: Vector2i in _state.next_cells:
+		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 
-func calculate_next_generation() -> void:
-	var used_cells: Array[Vector2i] = tile_map.get_used_cells(MAIN_LAYER)
+func update_stilllife_from_state(_state: State) -> void:
+	if still_life.visible == false:
+		return
 
-	for cell: Vector2i in used_cells:
-		var cell_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, cell)]
-		var cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[cell_material]
-		var cell_type: Elements.STATE_OF_MATTER = cell_info.state_of_matter
+	# Empty the still life tilemap
+	still_life.clear()
 
-		# Handle drain
-		if cell_info.is_drainage:
-			var down:Vector2i = cell + Vector2i(0, 1)
-			var up:Vector2i = cell + Vector2i(0, -1)
-			var left:Vector2i = cell + Vector2i(-1, 0)
-			var right:Vector2i = cell + Vector2i(1, 0)
-			# Can be extended
-			for pos:Vector2i in [down, up, left, right]:
-				if state.get_cell(pos) == cell_info.drains:
-					state.set_cell(pos, Elements.ELEMENT.AIR)
-			continue
-
-		# Handle generation
-		if cell_info.is_generator:
-			var down:Vector2i = cell + Vector2i(0, 1)
-			# Can be extended
-			for pos:Vector2i in [down]:
-				if state.is_position_available(pos):
-					state.set_cell(pos, cell_info.generates)
-			continue
-
-		# Handle decay
-		if cell_info.decay_chance > 0.0 and randf() < cell_info.decay_chance:
-			state.set_cell(cell, cell_info.decay_into)
-			continue
-
-		# Handle hot
-		if cell_info.is_hot:
-			for dx: int in range(-1, 2, 1):
-				for dy: int in range(-1, 2, 1):
-					var burn_target: Vector2i = cell + Vector2i(dx, dy)
-					var burn_material: Elements.ELEMENT = Elements.ATLAS_COORD_TO_ELEMENT[tile_map.get_cell_atlas_coords(MAIN_LAYER, burn_target)]
-					var burn_info: element_template = Elements.ELEMENT_TO_TEMPLATE[burn_material]
-					if burn_info.burn_chance > 0.0 and randf() < burn_info.burn_chance:
-						state.set_cell(burn_target, burn_info.burn_into)
-
-		# Ignore solids
-		if cell_type == Elements.STATE_OF_MATTER.SOLID:
-			continue
-
-		# Handle viscosity
-		if cell_info.viscosity > 0.0 and randf() < cell_info.viscosity:
-			continue
-
-		var cell_weight: int = cell_info.weight
-		var direction: int = signi(cell_weight)
-
-		var straight_cell: Vector2i = Vector2i(cell.x, cell.y + direction)
-
-		# Handle the movements
-		# if target position is air, just swap them
-		if state.is_position_available(straight_cell):
-			state.swap_cells(straight_cell, cell)
-		else:
-			var oc_material: Elements.ELEMENT = state.get_cell(straight_cell)
-			var oc_info: element_template = Elements.ELEMENT_TO_TEMPLATE[oc_material]
-			var oc_weight: int = oc_info.weight
-
-			# if cell is heavier than the occupied cell and the other is not solid
-			# swap
-			if oc_weight < cell_weight and oc_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID:
-				state.swap_cells(cell, straight_cell)
-			else:
-				# directional modifier if the cell is grain type
-				var grain_modifier: int = direction if cell_type == Elements.STATE_OF_MATTER.GRAIN else 0
-
-				var left_cell: Vector2i = Vector2i(cell.x - 1, cell.y + grain_modifier)
-				var left_cell_material: Elements.ELEMENT = state.get_cell(left_cell)
-				var left_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[left_cell_material]
-
-				var right_cell: Vector2i = Vector2i(cell.x + 1, cell.y + grain_modifier)
-				var right_cell_material: Elements.ELEMENT = state.get_cell(right_cell)
-				var right_cell_info: element_template = Elements.ELEMENT_TO_TEMPLATE[right_cell_material]
-
-				var available_cells: Array[Vector2i] = []
-				if left_cell_material == Elements.ELEMENT.AIR or (left_cell_info.weight < cell_weight and left_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(left_cell)
-				if right_cell_material == Elements.ELEMENT.AIR or (right_cell_info.weight < cell_weight and right_cell_info.state_of_matter != Elements.STATE_OF_MATTER.SOLID):
-					available_cells.append(right_cell)
-
-				if available_cells.size() > 0:
-					var target_cell: Vector2i = available_cells.pick_random()
-					state.swap_cells(cell, target_cell)
+	# Re-draw it with the current cell and still cells information
+	for cell: Vector2i in _state.current_cells:
+			still_life.set_cell(MAIN_LAYER, cell, 1, Vector2i(0,0))
+	for cell: Vector2i in _state.still_cells:
+			still_life.set_cell(MAIN_LAYER, cell, 1, Vector2i(1,0))
 
 # used for simulation speed
 func _on_timer_timeout() -> void:
-	loop_tile_set()
-	$Timer.start()
+	main_loop()
 
 func update_counts_panel() -> void:
 	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.SAND]))
@@ -196,7 +111,6 @@ func update_counts_panel() -> void:
 
 func _on_hot_bar_index_changed(current_material: Elements.ELEMENT) -> void:
 	material_in_hand = current_material
-	print(material_in_hand)
 
 func flick_element_name() ->void:
 	tool_tip_label.text = Elements.ELEMENT_TO_TEMPLATE[material_in_hand].name
