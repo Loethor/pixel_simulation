@@ -15,37 +15,27 @@ var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
 var is_placing_blocks :bool = false
 var state: State
 
-@onready var tool_tip_label: Label = $GUI/ToolTipLabel
-@onready var fps: Label = $GUI/FPS
-@onready var hot_bar: HotBar = $GUI/HotBar
+@onready var gui: GUIInterface = $GUI/GUI
+@onready var hot_bar: HotBar = $GUI/GUI/PanelContainer/MarginContainer/HotBar
 @onready var tile_map: TileMap = $TileMap
 @onready var still_life: TileMap = $StillLife
 
 func _ready() -> void:
 	state = State.new(tile_map)
-	hot_bar.index_changed.connect(_on_hot_bar_index_changed)
-	hot_bar.scrolled.connect(flick_element_name)
+	gui.plus_pressed.connect(_increase_brush)
+	gui.minus_pressed.connect(_decrease_brush)
+	gui.hotbal_index_changed.connect(_on_hotbar_index_changed)
 
 func _input(event: InputEvent) -> void:
-
-	# changing materials with 1,2,3...
-	if event.is_action_pressed("sand"):
-		hot_bar.current_index = 0
-	if event.is_action_pressed("water"):
-		hot_bar.current_index = 1
-	if event.is_action_pressed("bedrock"):
-		hot_bar.current_index = 2
-	if event.is_action_pressed("oil"):
-		hot_bar.current_index = 3
-	if event.is_action_pressed("fire"):
-		hot_bar.current_index = 4
-	if event.is_action_pressed("fuse"):
-		hot_bar.current_index = 5
-
 	if event.is_action_pressed("increase_brush"):
-		brush_size += 1
+		_increase_brush()
 	if event.is_action_pressed("decrease_brush"):
-		brush_size -= 1
+		_decrease_brush()
+
+func _increase_brush() -> void:
+	brush_size += 1
+func _decrease_brush() -> void:
+	brush_size -= 1
 
 func _unhandled_input(event: InputEvent) -> void:
 	# placing pixels in a square of brush_size size around mouse position
@@ -55,8 +45,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		is_placing_blocks = false
 
 func _process(_delta: float) -> void:
-	fps.text = "%s" % Engine.get_frames_per_second()
-
 	if is_placing_blocks:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
 		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
@@ -68,7 +56,6 @@ func main_loop() -> void:
 		state.update(tile_map)
 		update_tilemap_from_state(state)
 		update_stilllife_from_state(state)
-
 
 func update_tilemap_from_state(_state: State) -> void:
 	for modified_position: Vector2i in _state.next_cells:
@@ -91,11 +78,5 @@ func update_stilllife_from_state(_state: State) -> void:
 func _on_timer_timeout() -> void:
 	main_loop()
 
-func _on_hot_bar_index_changed(current_material: Elements.ELEMENT) -> void:
+func _on_hotbar_index_changed(current_material: Elements.ELEMENT) -> void:
 	material_in_hand = current_material
-
-func flick_element_name() ->void:
-	tool_tip_label.text = Elements.ELEMENT_TO_TEMPLATE[material_in_hand].name
-	tool_tip_label.show()
-	await get_tree().create_timer(.4).timeout
-	tool_tip_label.hide()

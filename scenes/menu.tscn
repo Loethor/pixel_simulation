@@ -1,0 +1,76 @@
+[gd_scene load_steps=9 format=3 uid="uid://kkihhxlc0qvu"]
+
+[ext_resource type="Script" path="res://scripts/menu.gd" id="1_38cny"]
+[ext_resource type="Texture2D" uid="uid://bg2rtyguchoo4" path="res://assets/gui/texture_panel.png" id="2_hnppw"]
+[ext_resource type="Texture2D" uid="uid://bies723fywnln" path="res://assets/gui/panel_nine_patch.png" id="3_8lesf"]
+[ext_resource type="Texture2D" uid="uid://cgyrojq8umexe" path="res://assets/gui/buttons/home_button.png" id="4_ns737"]
+[ext_resource type="Texture2D" uid="uid://md6wvopjrt7j" path="res://assets/gui/buttons/home_button_pressed.png" id="5_0g04u"]
+[ext_resource type="Texture2D" uid="uid://b7t1xacpku4fi" path="res://assets/gui/buttons/close_button.png" id="6_tx0xj"]
+[ext_resource type="Texture2D" uid="uid://flq7gs7t4785" path="res://assets/gui/buttons/close_button_pressed.png" id="7_5c4gn"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jckrm"]
+texture = ExtResource("2_hnppw")
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_38cny")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_jckrm")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_8lesf")
+patch_margin_left = 2
+patch_margin_top = 2
+patch_margin_right = 2
+patch_margin_bottom = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -22.0
+offset_top = -19.5
+offset_right = 22.0
+offset_bottom = 19.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MenuButton" type="TextureButton" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("4_ns737")
+texture_pressed = ExtResource("5_0g04u")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="CloseButton" type="TextureButton" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("6_tx0xj")
+texture_pressed = ExtResource("7_5c4gn")
+ignore_texture_size = true
+stretch_mode = 5
+
+[connection signal="pressed" from="Panel/VBoxContainer/MenuButton" to="." method="_on_menu_button_pressed"]
+[connection signal="pressed" from="Panel/VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]
