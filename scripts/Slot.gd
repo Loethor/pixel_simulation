@@ -10,7 +10,6 @@ var material_of_the_button: Elements.ELEMENT = Elements.ELEMENT.AIR :
 	set(value):
 		material_of_the_button = value
 		tool_tip_label_text = Elements.ELEMENT_TO_TEMPLATE[material_of_the_button].name
-var id: int
 
 @onready var border: NinePatchRect = $Border
 

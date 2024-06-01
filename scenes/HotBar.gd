@@ -3,11 +3,9 @@ class_name HotBar
 
 @export var slot_scene:PackedScene
 @export var elements_in_hotbar: Array[element_template]
-
+@export var tooltip_label: Label
 signal index_changed(current_material:Elements.ELEMENT)
 signal scrolled()
-signal tooltip_text_changed(new_element: element_template)
-signal tooltip_hid
 
 var slots :Array
 var current_material:Elements.ELEMENT
@@ -20,15 +18,12 @@ var current_index: int:
 		set_focus()
 
 func _ready() -> void:
-	var id:int = 0
 	for element:element_template in elements_in_hotbar:
 		Elements.print_element(element.element_type)
 		var new_slot: Slot = slot_scene.instantiate()
 		new_slot.texture_normal = element.atlas
 		new_slot.material_of_the_button = element.element_type
 		new_slot.slot_reacted.connect(_on_slot_reacted)
-		new_slot.id = id
-		id += 1
 		add_child(new_slot)
 	slots = get_children()
 	current_index = 0
@@ -45,9 +40,10 @@ func set_focus() -> void:
 
 func _on_slot_reacted(id:int) -> void:
 	if id == -1:
-		tooltip_hid.emit()
+		tooltip_label.hide()
 	else:
-		tooltip_text_changed.emit(elements_in_hotbar[id])
+		tooltip_label.show()
+		tooltip_label.text = elements_in_hotbar[id].name
 
 func _input(event:InputEvent) -> void:
 	if event.is_action_pressed("scroll_up"):

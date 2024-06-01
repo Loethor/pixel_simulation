@@ -43,7 +43,6 @@ gdscript/warnings/function_used_as_property=2
 gdscript/warnings/untyped_declaration=2
 gdscript/warnings/inferred_declaration=1
 gdscript/warnings/unsafe_void_return=2
-gdscript/warnings/return_value_discarded=1
 gdscript/warnings/static_called_on_instance=2
 gdscript/warnings/redundant_static_unload=2
 gdscript/warnings/redundant_await=2

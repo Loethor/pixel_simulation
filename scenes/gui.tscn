@@ -155,9 +155,10 @@ texture_pressed = ExtResource("10_vxg0r")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="Menu" parent="." instance=ExtResource("12_vhr31")]
+[node name="Menu" parent="." node_paths=PackedStringArray("panel_container") instance=ExtResource("12_vhr31")]
 visible = false
 layout_mode = 1
+panel_container = NodePath("../PanelContainer")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 2
@@ -174,7 +175,7 @@ theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 2
 theme_override_constants/margin_bottom = 2
 
-[node name="HotBar" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+[node name="HotBar" type="HBoxContainer" parent="PanelContainer/MarginContainer" node_paths=PackedStringArray("tooltip_label")]
 layout_mode = 2
 size_flags_vertical = 8
 mouse_filter = 0
@@ -183,6 +184,7 @@ alignment = 1
 script = ExtResource("13_7ri5t")
 slot_scene = ExtResource("14_basvc")
 elements_in_hotbar = Array[Resource("res://resources/elements/element_template.gd")]([ExtResource("15_i6uu7"), ExtResource("16_rxdii"), ExtResource("17_pfmeq"), ExtResource("18_u71gb"), ExtResource("19_k0jac"), ExtResource("20_roytw"), ExtResource("21_e1mk6"), ExtResource("22_113bd"), ExtResource("23_q8alk"), ExtResource("24_nxyo3"), ExtResource("25_f5lqb"), ExtResource("26_nrij3")])
+tooltip_label = NodePath("../../../TooltipLabel")
 
 [connection signal="pressed" from="VBoxContainer/PlusButton" to="." method="_on_plus_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/MinusButton" to="." method="_on_minus_button_pressed"]

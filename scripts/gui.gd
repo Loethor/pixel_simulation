@@ -5,6 +5,7 @@ class_name GUIInterface
 @onready var fps_label: Label = $FPSLabel
 @onready var tooltip_label: Label = $TooltipLabel
 @onready var hot_bar: HotBar = $PanelContainer/MarginContainer/HotBar
+@onready var panel_container: PanelContainer = $PanelContainer
 
 signal plus_pressed
 signal minus_pressed
@@ -12,8 +13,6 @@ signal hotbal_index_changed(current_material: Elements.ELEMENT)
 
 func _ready() -> void:
 	hot_bar.index_changed.connect(_on_hot_bar_index_changed)
-	hot_bar.tooltip_text_changed.connect(_on_tooltip_text_changed)
-	hot_bar.tooltip_hid.connect(_on_tooltip_hid)
 
 func _process(_delta: float) -> void:
 	fps_label.text = "%s" % Engine.get_frames_per_second()
@@ -36,16 +35,10 @@ func _on_reset_button_pressed() -> void:
 
 func _on_menu_button_pressed() -> void:
 	menu.show()
+	panel_container.hide()
 
 func _on_plus_button_pressed() -> void:
 	plus_pressed.emit()
 
 func _on_minus_button_pressed() -> void:
 	minus_pressed.emit()
-
-func _on_tooltip_text_changed(new_element: element_template) -> void:
-	tooltip_label.text = new_element.name
-	tooltip_label.show()
-
-func _on_tooltip_hid() -> void:
-	tooltip_label.hide()
