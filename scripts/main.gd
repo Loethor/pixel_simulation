@@ -16,13 +16,7 @@ var is_placing_blocks :bool = false
 var state: State
 
 @onready var tool_tip_label: Label = $GUI/ToolTipLabel
-@onready var sand_label: Label = %SandLabel
-@onready var water_label: Label = %WaterLabel
-@onready var rock_label: Label = %RockLabel
-@onready var oil_label: Label = %OilLabel
-@onready var fire_label: Label = %FireLabel
 @onready var fps: Label = $GUI/FPS
-@onready var counts_panel: PanelContainer = %CountsPanel
 @onready var hot_bar: HotBar = $GUI/HotBar
 @onready var tile_map: TileMap = $TileMap
 @onready var still_life: TileMap = $StillLife
@@ -48,9 +42,6 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("fuse"):
 		hot_bar.current_index = 5
 
-	if event.is_action_pressed("show_counts"):
-		counts_panel.visible = !counts_panel.visible
-
 	if event.is_action_pressed("increase_brush"):
 		brush_size += 1
 	if event.is_action_pressed("decrease_brush"):
@@ -65,8 +56,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _process(_delta: float) -> void:
 	fps.text = "%s" % Engine.get_frames_per_second()
-	if counts_panel.visible:
-		update_counts_panel()
 
 	if is_placing_blocks:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
@@ -101,13 +90,6 @@ func update_stilllife_from_state(_state: State) -> void:
 # used for simulation speed
 func _on_timer_timeout() -> void:
 	main_loop()
-
-func update_counts_panel() -> void:
-	sand_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.SAND]))
-	water_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.WATER]))
-	rock_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.BEDROCK]))
-	oil_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.OIL]))
-	fire_label.text = "%s" % len(tile_map.get_used_cells_by_id(MAIN_LAYER,0,Elements.ELEMENT_TO_ATLAS_COORD[Elements.ELEMENT.FIRE]))
 
 func _on_hot_bar_index_changed(current_material: Elements.ELEMENT) -> void:
 	material_in_hand = current_material
