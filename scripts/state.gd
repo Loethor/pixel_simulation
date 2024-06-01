@@ -73,9 +73,12 @@ func _obtain_all_cell_neighbors(at_cell:Vector2i) -> Array[Vector2i]:
 func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i]) -> bool:
 
 	# do not consider neighbours the same when a cell has been changed within this timeframe
-	if (next_cells[as_cell] != current_cells[as_cell] if as_cell in next_cells else false):
+	if as_cell in next_cells:
 		return false
 	for neighbor_cell:Vector2i in neighbor_cells:
+		# also consider the neighbours different if any of the neighbours has been changed within this timeframe
+		if neighbor_cell in next_cells:
+			return false
 		var neighbor_element: Elements.ELEMENT = current_cells.get(neighbor_cell, Elements.ELEMENT.AIR)
 
 		# if `as_cell` has at least 1 AIR as neighbor, it should be alive (returning false)
@@ -251,6 +254,7 @@ func _is_position_modified(at_position: Vector2i) -> bool:
 func _update_next_cells_with_placed() -> void:
 	for cell: Vector2i in placed_cells:
 		next_cells[cell] = placed_cells[cell]
+		current_cells[cell] = next_cells[cell]
 		for nei: Vector2i in _obtain_all_cell_neighbors(cell):
 			if nei in still_cells:
 				still_cells.erase(nei)
