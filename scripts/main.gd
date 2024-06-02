@@ -17,11 +17,11 @@ var state: State
 
 @onready var gui: GUIInterface = $GUI/GUI
 @onready var hot_bar: HotBar = $GUI/GUI/PanelContainer/MarginContainer/HotBar
-@onready var tile_map: TileMap = $TileMap
+@onready var simulation_tile_map: TileMap = $SimulationTileMap
 @onready var still_life: TileMap = $StillLife
 
 func _ready() -> void:
-	state = State.new(tile_map)
+	state = State.new(simulation_tile_map)
 	gui.plus_pressed.connect(_increase_brush)
 	gui.minus_pressed.connect(_decrease_brush)
 	gui.hotbal_index_changed.connect(_on_hotbar_index_changed)
@@ -53,13 +53,13 @@ func _process(_delta: float) -> void:
 
 func main_loop() -> void:
 	if state:
-		state.update(tile_map)
+		state.update(simulation_tile_map)
 		update_tilemap_from_state(state)
 		update_stilllife_from_state(state)
 
 func update_tilemap_from_state(_state: State) -> void:
 	for modified_position: Vector2i in _state.next_cells:
-		tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
+		simulation_tile_map.set_cell(MAIN_LAYER, modified_position, 0, Elements.ELEMENT_TO_ATLAS_COORD[state.next_cells[modified_position]])
 
 func update_stilllife_from_state(_state: State) -> void:
 	if still_life.visible == false:

@@ -18,6 +18,7 @@ enum ELEMENT{
 	WATER_DRAIN,
 	METHANE,
 	HONEY,
+	SAND_GENERATOR,
 }
 func print_element(element: ELEMENT) -> void:
 	print(Elements.ELEMENT.keys()[element])
@@ -38,6 +39,7 @@ const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(5,2):ELEMENT.BURNED_FUSE,
 	Vector2i(6,0):ELEMENT.WATER_GENERATOR,
 	Vector2i(6,1):ELEMENT.WATER_DRAIN,
+	Vector2i(6,2):ELEMENT.SAND_GENERATOR,
 	Vector2i(7,0):ELEMENT.METHANE,
 	Vector2i(8,0):ELEMENT.HONEY,
 }
@@ -58,6 +60,7 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.BURNED_FUSE:Vector2i(5,2),
 	ELEMENT.WATER_GENERATOR:Vector2i(6,0),
 	ELEMENT.WATER_DRAIN:Vector2i(6,1),
+	ELEMENT.SAND_GENERATOR:Vector2i(6,2),
 	ELEMENT.METHANE:Vector2i(7,0),
 	ELEMENT.HONEY:Vector2i(8,0),
 }
@@ -80,6 +83,7 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.METHANE:preload("res://resources/elements/methane.tres"),
 	ELEMENT.HONEY:preload("res://resources/elements/honey.tres"),
 	ELEMENT.ROCK:preload("res://resources/elements/rock.tres"),
+	ELEMENT.SAND_GENERATOR:preload("res://resources/elements/sand_generator.tres"),
 }
 
 enum STATE_OF_MATTER {GRAIN, LIQUID, SOLID, GAS}
