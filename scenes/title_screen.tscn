@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dmdxlneb8ogg5"]
+[gd_scene load_steps=4 format=3 uid="uid://dmdxlneb8ogg5"]
 
 [ext_resource type="PackedScene" uid="uid://mmhajmqwcfod" path="res://scenes/simulation_tile_map.tscn" id="1_0l4qu"]
 [ext_resource type="Script" path="res://scripts/title_screen.gd" id="1_bfdyb"]
+[ext_resource type="FontFile" uid="uid://dsqx35ypm7eqq" path="res://assets/gui/PressStart2P-Regular.ttf" id="3_b7icn"]
 
 [node name="TitleScreen" type="Node2D"]
 script = ExtResource("1_bfdyb")
@@ -39,11 +40,13 @@ offset_bottom = 40.0
 
 [node name="PlayButton" type="Button" parent="Control/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_b7icn")
 theme_override_font_sizes/font_size = 6
 text = "Play"
 
 [node name="QuitButton" type="Button" parent="Control/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_b7icn")
 theme_override_font_sizes/font_size = 6
 text = "Quit"
 

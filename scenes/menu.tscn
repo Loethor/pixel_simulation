@@ -1,12 +1,12 @@
 [gd_scene load_steps=9 format=3 uid="uid://kkihhxlc0qvu"]
 
 [ext_resource type="Script" path="res://scripts/menu.gd" id="1_38cny"]
-[ext_resource type="Texture2D" uid="uid://bg2rtyguchoo4" path="res://assets/gui/texture_panel.png" id="2_hnppw"]
-[ext_resource type="Texture2D" uid="uid://bies723fywnln" path="res://assets/gui/panel_nine_patch.png" id="3_8lesf"]
-[ext_resource type="Texture2D" uid="uid://cgyrojq8umexe" path="res://assets/gui/buttons/home_button.png" id="4_ns737"]
-[ext_resource type="Texture2D" uid="uid://md6wvopjrt7j" path="res://assets/gui/buttons/home_button_pressed.png" id="5_0g04u"]
-[ext_resource type="Texture2D" uid="uid://b7t1xacpku4fi" path="res://assets/gui/buttons/close_button.png" id="6_tx0xj"]
-[ext_resource type="Texture2D" uid="uid://flq7gs7t4785" path="res://assets/gui/buttons/close_button_pressed.png" id="7_5c4gn"]
+[ext_resource type="Texture2D" uid="uid://dlsi4mk3pqn0c" path="res://assets/gui/texture_panel.png" id="2_hnppw"]
+[ext_resource type="Texture2D" uid="uid://qm7xl2sgguod" path="res://assets/gui/panel_nine_patch.png" id="3_8lesf"]
+[ext_resource type="Texture2D" uid="uid://bkm1m555ki2rm" path="res://assets/gui/buttons/home_button.png" id="4_ns737"]
+[ext_resource type="Texture2D" uid="uid://c5grpvjnixjqn" path="res://assets/gui/buttons/home_button_pressed.png" id="5_0g04u"]
+[ext_resource type="Texture2D" uid="uid://drja42wyl5c3x" path="res://assets/gui/buttons/close_button.png" id="6_tx0xj"]
+[ext_resource type="Texture2D" uid="uid://16dls8rxnol2" path="res://assets/gui/buttons/close_button_pressed.png" id="7_5c4gn"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jckrm"]
 texture = ExtResource("2_hnppw")
