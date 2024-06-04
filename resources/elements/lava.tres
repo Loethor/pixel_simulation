@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://deanix65jxa3y"]
+
+[ext_resource type="Texture2D" uid="uid://dyqhvij2sow5y" path="res://assets/tiles.png" id="1_57nx1"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="1_ode7c"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r56tx"]
+atlas = ExtResource("1_57nx1")
+region = Rect2(3, 1, 1, 1)
+
+[resource]
+script = ExtResource("1_ode7c")
+element_type = 18
+tile_map_atlas_coords = Vector2i(3, 1)
+name = "Lava"
+weight = 5
+state_of_matter = 0
+viscosity = 0.5
+decay_chance = 0.005
+decay_into = 9
+is_generator = false
+generates = 0
+is_drainage = false
+drains = 0
+is_hot = true
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_r56tx")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://6pupuwm17g0s"]
+[gd_scene load_steps=29 format=3 uid="uid://6pupuwm17g0s"]
 
 [ext_resource type="Texture2D" uid="uid://qm7xl2sgguod" path="res://assets/gui/panel_nine_patch.png" id="1_fyknj"]
 [ext_resource type="Script" path="res://scripts/gui.gd" id="1_nbn27"]
@@ -26,6 +26,7 @@
 [ext_resource type="Resource" uid="uid://bel5kx7t3mqax" path="res://resources/elements/oil.tres" id="24_nxyo3"]
 [ext_resource type="Resource" uid="uid://bwqxsw4s3j7yy" path="res://resources/elements/water_drain.tres" id="25_f5lqb"]
 [ext_resource type="Resource" uid="uid://cos57wttbfwmm" path="res://resources/elements/water_generator.tres" id="26_nrij3"]
+[ext_resource type="Resource" uid="uid://deanix65jxa3y" path="res://resources/elements/lava.tres" id="27_7wh2k"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tkhw3"]
 texture = ExtResource("1_fyknj")
@@ -183,7 +184,7 @@ theme_override_constants/separation = 1
 alignment = 1
 script = ExtResource("13_7ri5t")
 slot_scene = ExtResource("14_basvc")
-elements_in_hotbar = Array[Resource("res://resources/elements/element_template.gd")]([ExtResource("15_i6uu7"), ExtResource("16_rxdii"), ExtResource("17_pfmeq"), ExtResource("18_u71gb"), ExtResource("19_k0jac"), ExtResource("20_roytw"), ExtResource("21_e1mk6"), ExtResource("22_113bd"), ExtResource("23_q8alk"), ExtResource("24_nxyo3"), ExtResource("25_f5lqb"), ExtResource("26_nrij3")])
+elements_in_hotbar = Array[Resource("res://resources/elements/element_template.gd")]([ExtResource("15_i6uu7"), ExtResource("16_rxdii"), ExtResource("17_pfmeq"), ExtResource("18_u71gb"), ExtResource("19_k0jac"), ExtResource("20_roytw"), ExtResource("21_e1mk6"), ExtResource("22_113bd"), ExtResource("23_q8alk"), ExtResource("24_nxyo3"), ExtResource("25_f5lqb"), ExtResource("26_nrij3"), ExtResource("27_7wh2k")])
 tooltip_label = NodePath("../../../TooltipLabel")
 
 [connection signal="pressed" from="VBoxContainer/PlusButton" to="." method="_on_plus_button_pressed"]

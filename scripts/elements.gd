@@ -19,6 +19,7 @@ enum ELEMENT{
 	METHANE,
 	HONEY,
 	SAND_GENERATOR,
+	LAVA,
 }
 func print_element(element: ELEMENT) -> void:
 	print(Elements.ELEMENT.keys()[element])
@@ -32,6 +33,7 @@ const ATLAS_COORD_TO_ELEMENT: Dictionary = {
 	Vector2i(2,0):ELEMENT.FIRE,
 	Vector2i(2,1):ELEMENT.SMOKE,
 	Vector2i(3,0):ELEMENT.OIL,
+	Vector2i(3,1):ELEMENT.LAVA,
 	Vector2i(4,0):ELEMENT.BEDROCK,
 	Vector2i(4,1):ELEMENT.ROCK,
 	Vector2i(5,0):ELEMENT.FUSE,
@@ -53,6 +55,7 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.FIRE:Vector2i(2,0),
 	ELEMENT.SMOKE:Vector2i(2,1),
 	ELEMENT.OIL:Vector2i(3,0),
+	ELEMENT.LAVA:Vector2i(3,1),
 	ELEMENT.BEDROCK:Vector2i(4,0),
 	ELEMENT.ROCK:Vector2i(4,1),
 	ELEMENT.FUSE:Vector2i(5,0),
@@ -72,6 +75,7 @@ const ELEMENT_TO_ATLAS_COORD:Dictionary = {
 	ELEMENT.ICE:preload("res://resources/elements/ice.tres"),
 	ELEMENT.BEDROCK:preload("res://resources/elements/bedrock.tres"),
 	ELEMENT.OIL:preload("res://resources/elements/oil.tres"),
+	ELEMENT.LAVA:preload("res://resources/elements/lava.tres"),
 	ELEMENT.FIRE:preload("res://resources/elements/fire.tres"),
 	ELEMENT.STEAM:preload("res://resources/elements/steam.tres"),
 	ELEMENT.SMOKE:preload("res://resources/elements/smoke.tres"),
