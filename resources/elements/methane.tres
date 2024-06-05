@@ -9,7 +9,7 @@ region = Rect2(7, 0, 1, 1)
 
 [resource]
 script = ExtResource("1_hjoqy")
-element_type = 14
+element_type = 15
 tile_map_atlas_coords = Vector2i(7, 0)
 name = "Methane"
 weight = -3
@@ -23,5 +23,5 @@ is_drainage = false
 drains = 0
 is_hot = false
 burn_chance = 1.0
-burn_into = 6
+burn_into = 5
 atlas = SubResource("AtlasTexture_jkxbq")

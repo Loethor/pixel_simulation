@@ -86,7 +86,7 @@ func _are_neighbors_of_same_type(as_cell:Vector2i, neighbor_cells:Array[Vector2i
 			return false
 
 		# rock is wildcar
-		if neighbor_element == Elements.ELEMENT.BEDROCK:
+		if neighbor_element == Elements.ELEMENT.ROCK:
 			continue
 		# we use get because neighbor_cell may not be in current cells
 		if neighbor_element != current_cells[as_cell]:
@@ -146,7 +146,8 @@ func _calculate_next_generation() -> void:
 
 		# Ignore solids
 		if cell_type == Elements.STATE_OF_MATTER.SOLID:
-			if cell_material == Elements.ELEMENT.BEDROCK:
+			if cell_material == Elements.ELEMENT.ROCK or \
+			cell_material == Elements.ELEMENT.BEDROCK:
 				still_cells[cell] = null
 			continue
 
@@ -221,12 +222,15 @@ func set_next_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
 	# remove neigh from still
 	for alive_cell:Vector2i in _obtain_all_cell_neighbors(position):
 		# rocks remain still-life
-		if current_cells.get(alive_cell, -1) == Elements.ELEMENT.BEDROCK:
+		if current_cells.get(alive_cell, -1) == Elements.ELEMENT.ROCK or \
+		   current_cells.get(alive_cell, -1) == Elements.ELEMENT.BEDROCK:
 			continue
 		still_cells.erase(alive_cell)
 	still_cells.erase(position)
 
 func set_placed_cell(position: Vector2i, new_material: Elements.ELEMENT) -> void:
+	if current_cells.get(position, -1) == Elements.ELEMENT.BEDROCK:
+		return
 	placed_cells[position] = new_material
 
 	# air needs to be deleted from current cells
