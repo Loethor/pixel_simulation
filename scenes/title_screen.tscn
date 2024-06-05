@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://mmhajmqwcfod" path="res://scenes/simulation_tile_map.tscn" id="1_0l4qu"]
 [ext_resource type="Script" path="res://scripts/title_screen.gd" id="1_bfdyb"]
-[ext_resource type="FontFile" uid="uid://dsqx35ypm7eqq" path="res://assets/gui/PressStart2P-Regular.ttf" id="3_b7icn"]
+[ext_resource type="FontFile" uid="uid://dynm5rn8hgood" path="res://assets/gui/PressStart2P-Regular.ttf" id="3_b7icn"]
 
 [node name="TitleScreen" type="Node2D"]
 script = ExtResource("1_bfdyb")

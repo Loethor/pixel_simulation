@@ -3,12 +3,7 @@ extends Node2D
 # Tilemap Layer
 const MAIN_LAYER:int = 0
 
-# Brush settings
-const MIN_BRUSH_SIZE: int = 1
-const MAX_BRUSH_SIZE:int = 7
-@export var brush_size: int = MIN_BRUSH_SIZE : set = set_brush
-func set_brush(value: int) -> void:
-	brush_size = clamp(value, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE)
+
 
 # Current material selected to place
 var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
@@ -22,20 +17,11 @@ var state: State
 
 func _ready() -> void:
 	state = State.new(simulation_tile_map)
-	gui.plus_pressed.connect(_increase_brush)
-	gui.minus_pressed.connect(_decrease_brush)
 	gui.hotbal_index_changed.connect(_on_hotbar_index_changed)
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("increase_brush"):
-		_increase_brush()
-	if event.is_action_pressed("decrease_brush"):
-		_decrease_brush()
 
-func _increase_brush() -> void:
-	brush_size += 1
-func _decrease_brush() -> void:
-	brush_size -= 1
+
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	# placing pixels in a square of brush_size size around mouse position
@@ -47,8 +33,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if is_placing_blocks:
 		var mouse_pos:Vector2i = Vector2i(get_global_mouse_position())
-		for i: int in range(mouse_pos.x - brush_size + 1, mouse_pos.x + brush_size):
-			for j: int in range(mouse_pos.y - brush_size + 1, mouse_pos.y + brush_size):
+		for i: int in range(mouse_pos.x - gui.brush_size + 1, mouse_pos.x + gui.brush_size):
+			for j: int in range(mouse_pos.y - gui.brush_size + 1, mouse_pos.y + gui.brush_size):
 				state.set_placed_cell(Vector2i(i,j), material_in_hand)
 
 func main_loop() -> void:
