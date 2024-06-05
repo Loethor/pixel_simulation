@@ -6,7 +6,7 @@ class_name GUIInterface
 @onready var tooltip_label: Label = $TooltipLabel
 @onready var hot_bar: HotBar = $PanelContainer/MarginContainer/HotBar
 @onready var panel_container: PanelContainer = $PanelContainer
-@onready var brush_size_indicator: GridContainer = $BrushSizeProgress
+@onready var brush_size_indicator: GridContainer = $BrushSizeIndicator
 
 signal hotbal_index_changed(current_material: Elements.ELEMENT)
 
@@ -71,7 +71,7 @@ func _update_brush_size_colors() -> void:
 		   i >= middle_child - brush_size + 1:
 			brush_size_indicator.get_child(k).color = Color.YELLOW
 
-func _flick_element_name(current_material: Elements.ELEMENT) ->void:
+func _flick_element_name(current_material: Elements.ELEMENT) -> void:
 	tooltip_label.text = Elements.ELEMENT_TO_TEMPLATE[current_material].name
 	tooltip_label.show()
 	await get_tree().create_timer(.4).timeout

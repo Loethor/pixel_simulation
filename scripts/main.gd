@@ -3,8 +3,6 @@ extends Node2D
 # Tilemap Layer
 const MAIN_LAYER:int = 0
 
-
-
 # Current material selected to place
 var material_in_hand: Elements.ELEMENT = Elements.ELEMENT.AIR
 var is_placing_blocks :bool = false
@@ -18,10 +16,6 @@ var state: State
 func _ready() -> void:
 	state = State.new(simulation_tile_map)
 	gui.hotbal_index_changed.connect(_on_hotbar_index_changed)
-
-
-
-
 
 func _unhandled_input(event: InputEvent) -> void:
 	# placing pixels in a square of brush_size size around mouse position
