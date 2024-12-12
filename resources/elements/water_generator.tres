@@ -9,7 +9,7 @@ region = Rect2(6, 0, 1, 1)
 
 [resource]
 script = ExtResource("1_t51td")
-element_type = 12
+element_type = 13
 tile_map_atlas_coords = Vector2i(6, 0)
 name = "Water Generator"
 weight = 0

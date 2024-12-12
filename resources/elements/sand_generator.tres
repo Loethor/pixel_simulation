@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="element_template" load_steps=4 format=3 uid="uid://xa3b7sfmywgr"]
+
+[ext_resource type="Texture2D" uid="uid://c8whi8kf0uml3" path="res://assets/rubber.png" id="1_gd5t0"]
+[ext_resource type="Script" path="res://resources/elements/element_template.gd" id="2_f4p45"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1ys0c"]
+atlas = ExtResource("1_gd5t0")
+region = Rect2(0, 0, 32, 32)
+
+[resource]
+script = ExtResource("2_f4p45")
+element_type = 17
+tile_map_atlas_coords = Vector2i(6, 2)
+name = "Sand Generator"
+weight = 0
+state_of_matter = 2
+viscosity = 0.0
+decay_chance = 0.0
+decay_into = 0
+is_generator = true
+generates = 1
+is_drainage = false
+drains = 0
+is_hot = false
+burn_chance = 0.0
+burn_into = 0
+atlas = SubResource("AtlasTexture_1ys0c")

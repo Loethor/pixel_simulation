@@ -9,7 +9,7 @@ region = Rect2(1, 2, 1, 1)
 
 [resource]
 script = ExtResource("1_d4tdn")
-element_type = 3
+element_type = 4
 tile_map_atlas_coords = Vector2i(1, 2)
 name = "Ice"
 weight = 0

@@ -9,7 +9,7 @@ region = Rect2(3, 0, 1, 1)
 
 [resource]
 script = ExtResource("2_500at")
-element_type = 5
+element_type = 7
 tile_map_atlas_coords = Vector2i(3, 0)
 name = "Oil"
 weight = 1
@@ -23,5 +23,5 @@ is_drainage = false
 drains = 0
 is_hot = false
 burn_chance = 1.0
-burn_into = 6
+burn_into = 5
 atlas = SubResource("AtlasTexture_41y04")

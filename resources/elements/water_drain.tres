@@ -9,7 +9,7 @@ region = Rect2(6, 1, 1, 1)
 
 [resource]
 script = ExtResource("1_d6wue")
-element_type = 13
+element_type = 14
 tile_map_atlas_coords = Vector2i(6, 1)
 name = "Water Drain"
 weight = 0

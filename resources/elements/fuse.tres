@@ -9,7 +9,7 @@ region = Rect2(5, 0, 1, 1)
 
 [resource]
 script = ExtResource("1_tdsaa")
-element_type = 9
+element_type = 10
 tile_map_atlas_coords = Vector2i(5, 0)
 name = "Fuse"
 weight = 0
@@ -23,5 +23,5 @@ is_drainage = false
 drains = 0
 is_hot = false
 burn_chance = 1.0
-burn_into = 10
+burn_into = 11
 atlas = SubResource("AtlasTexture_6xxp4")

@@ -9,7 +9,7 @@ region = Rect2(1, 1, 1, 1)
 
 [resource]
 script = ExtResource("1_611r2")
-element_type = 7
+element_type = 3
 tile_map_atlas_coords = Vector2i(1, 1)
 name = "Steam"
 weight = -2
