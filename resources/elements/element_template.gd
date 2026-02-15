@@ -27,4 +27,3 @@ class_name element_template
 @export_subgroup("Texture")
 @export var atlas :AtlasTexture
 @export_group("")
-

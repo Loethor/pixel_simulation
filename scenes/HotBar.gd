@@ -52,5 +52,3 @@ func _input(event:InputEvent) -> void:
 		else:
 			current_index -= 1
 		emit_signal("scrolled")
-
-

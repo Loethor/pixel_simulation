@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://cutqa3lwfojcl"]
+
+[ext_resource type="Script" path="res://scenes/credits.gd" id="1_n25w8"]
+
+[node name="Credits" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_n25w8")
+
+[node name="Container" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ScrollingLine" type="Label" parent="Container"]
+layout_mode = 0
+offset_left = 71.0
+offset_top = 90.0
+offset_right = 111.0
+offset_bottom = 113.0
+theme_override_font_sizes/font_size = 3
